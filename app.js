@@ -176,8 +176,8 @@ document.getElementById('report-wc-btn').addEventListener('click', () => {
          if (!navigator.onLine) { alert("圏外だ！電波のある場所で送ってくれ！"); return; }
          if (!userLocationMarker) { alert("GPS待機中だ！"); return; }
          const pos = userLocationMarker.getLatLng();
-         // 👇 メールの件名も「救いの泉 レポート」からお行儀よく修正！
-         window.location.href = `mailto:reso.synq+toilet@gmail.com?subject=トイレに関する連絡&body=緯度:${pos.lat} 経度:${pos.lng}`;
+         // 👇 宛先を info@resosynq.com に変更！
+         window.location.href = `mailto:info@resosynq.com?subject=トイレに関する連絡&body=緯度:${pos.lat} 経度:${pos.lng}`;
     });
     
     const licenseOverlay = document.getElementById('license-overlay');

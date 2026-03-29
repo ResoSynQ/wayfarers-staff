@@ -1,7 +1,7 @@
 // --- 『旅人の杖と救いの泉』 Service Worker (Ver 1.0) ---
 
 // キャッシュの名前 (バージョンが変わったらここを書き換えることでデータを更新させる)
-const CACHE_NAME = 'wayfarers-staff-cache-v4';
+const CACHE_NAME = 'wayfarers-staff-cache-v5';
 
 // 【初回アクセス時】に絶対にキャッシュする命のファイルたち
 const CACHE_ASSETS = [

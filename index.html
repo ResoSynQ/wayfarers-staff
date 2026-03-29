@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>旅人の杖と救いの泉 - Wayfarer's Staff & The Spring of Relief</title>
+    <title>旅人の杖と救いの泉</title>
     
-<link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a1a1a">
-    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
     <link rel="icon" href="icon-512.jpg">
     
     <meta name="mobile-web-app-capable" content="yes">
@@ -16,7 +15,6 @@
     <link rel="apple-touch-icon" href="icon-512.jpg">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -29,75 +27,70 @@
     </div>
 
     <div id="map"></div>
-
     <button id="locate-btn" title="現在地に移動">🎯</button>
 
-    <div id="sidebar">
+    <div id="sidebar" class="closed">
         <button id="sidebar-toggle">☰</button>
         <div id="sidebar-content">
-            <h2>探索メニュー</h2>
+            <h2 class="menu-title">探索メニュー</h2>
+            
             <div class="menu-group">
-                <h3>🗿 史跡・道標パック (OSM)</h3>
-                <label><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> ♟️ 道標 (標準ピン)</label><br>
-                <label><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> 💠 古い境界標 (標準ピン)</label><br>
-                <label><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> 🥾 登山口 (標準ピン)</label><br>
-                <label><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> 🕰️ 公衆時計 (標準ピン)</label><br>
-                <label><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> ⛩️ 宗教施設・祠 (標準ピン)</label><br>
-                <label><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> 🗿 史跡・記念碑 (標準ピン)</label><br>
+                <label class="text-green"><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> ♟️ 道標</label>
+                <label class="text-green"><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> 💠 古い境界標</label>
+                <label class="text-green"><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> 🥾 登山マーカー</label>
+                <label class="text-green"><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> 🕰️ 公衆時計</label>
+                <label class="text-green"><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> ⛩️ 宗教施設・祠</label>
+                <label class="text-green"><input type="checkbox" class="category-toggle" data-file="OSM_relics_of_kinki_38142.geojson" checked> 🗿 史跡・記念碑</label>
+                <label class="text-green"><input type="checkbox" class="category-toggle" data-file="Gov-OSM_Park_30m_merge_17323.geojson" checked> 🌳 公園・遊具</label>
             </div>
+            
+            <hr class="menu-divider">
+            
             <div class="menu-group">
-                <h3>🌳 公園パック (Gov)</h3>
-                <label><input type="checkbox" class="category-toggle" data-file="Gov-OSM_Park_30m_merge_17323.geojson" checked> 🌳 公園・遊具 (標準ピン)</label><br>
+                <label class="text-blue"><input type="checkbox" class="category-toggle" data-file="Gov_Public Facilities-Gymnasiums_6278.geojson" checked> 🏟️ 公共施設</label>
+                <label class="text-blue"><input type="checkbox" class="category-toggle" data-file="Gov_Cultural_Facilities-Libraries_6100.geojson" checked> 📚 図書館</label>
+                <label class="text-blue"><input type="checkbox" class="category-toggle" data-file="Gov_cultural_6196.geojson" checked> 🏯 文化財</label>
             </div>
-            <div class="menu-group group-blue">
-                <h3>🏟️ 国・自治体施設 (Gov)</h3>
-                <label><input type="checkbox" class="category-toggle" data-file="Gov_Public Facilities-Gymnasiums_6278.geojson" checked> 🏟️ 体育館 (青ピン)</label><br>
-                <label><input type="checkbox" class="category-toggle" data-file="Gov_Cultural_Facilities-Libraries_6100.geojson" checked> 📚 図書館 (青ピン)</label><br>
-                <label><input type="checkbox" class="category-toggle" data-file="Gov_cultural_6196.geojson" checked> 🏯 文化財 (青ピン)</label><br>
-            </div>
-            <hr>
-            <div class="menu-group special-mode">
-                <label class="switch-label">🚾 **トイレモード** (オアシス索敵)
-                    <input type="checkbox" id="toilet-mode-toggle">
-                    <span class="slider round"></span>
+            
+            <hr class="menu-divider">
+            
+            <div class="menu-group">
+                <label class="switch-label text-black">🚾 トイレ
+                    <div class="toggle-wrapper">
+                        <span class="toggle-text">OFF</span>
+                        <input type="checkbox" id="toilet-mode-toggle">
+                        <span class="slider round"></span>
+                    </div>
                 </label>
             </div>
-            <hr>
-            <button id="license-btn">🗺️ ライセンス・出典</button>
-            <a href="#" id="help-link" target="_blank">❓ ヘルプ (別途ページ)</a>
+            
+            <button id="license-btn" class="text-black text-left">🗺️ ライセンス・出典</button>
+            <a href="#" id="help-link" target="_blank" class="text-black text-left">❓ ヘルプ</a>
         </div>
     </div>
 
     <div id="action-bar">
-        <button id="scan-btn"> 周辺をスキャン　</button>
-        <button id="report-wc-btn" class="hidden">🚾 **新たな泉** を現地調査 (メール・GAS投稿)</button>
+        <button id="scan-btn">周辺をスキャン</button>
+        <button id="report-wc-btn" class="hidden">🚾 新たな泉 を現地調査</button>
     </div>
 
     <div id="license-overlay" class="hidden">
         <div id="license-content">
             <button id="license-close-btn">マップへ戻る</button>
             <div id="license-text">
-                <h1>旅人の杖と救いの泉 利用規約・ライセンス</h1>
-                <p>制定日：2026年3月26日</p>
-                <p>© 2026 ResoSynQ. All Rights Reserved. Produced by ResoSynQ (supported by Gemini)</p>
+                <h1>旅人の杖と救いの泉 利用規約</h1>
+                <p>© 2026 ResoSynQ. All Rights Reserved.</p>
                 <hr>
-                <h2>免責事項</h2>
-                <p>本アプリは参考情報です。完全性・正確性を保証しません。利用は自己責任で行ってください。</p>
-                <h2>出典・著作権表示</h2>
-                <ul>
-                    <li>ベースマップ・一部データ: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL 1.0)</li>
-                    <li>公共データ: 国土交通省、デジタル庁、文化庁、および近畿各自治体のオープンデータを加工して使用しています。(CC BY 4.0等)</li>
-                </ul>
+                <p>ベースマップ: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL 1.0)</p>
             </div>
         </div>
     </div>
 
     <div id="ios-install-prompt" class="hidden">
-        <p>💡 より快適に探索（フルスクリーン＆オフライン対応）するために、下の【共有ボタン】から「ホーム画面に追加」してね！</p>
+        <p>💡 下の【共有ボタン】から「ホーム画面に追加」して全画面でプレイ！</p>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
     <script src="app.js"></script>
 </body>
 </html>

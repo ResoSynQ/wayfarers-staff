@@ -103,7 +103,8 @@ function createMarkerByFile(fileName, latlng, properties) {
     if (fileName.includes('relics') || fileName.includes('merge_17323')) {
         // 緑のピン (公園・オブジェクト)
         marker = L.marker(latlng, { icon: greenPinIcon });
-        category = fileName.includes('relics') ? "史跡・オブジェクト" : "公園・遊具";
+        // 👇 公園か遊具か未確定のため「/」で表記！
+        category = fileName.includes('relics') ? "史跡・オブジェクト" : "公園/遊具"; 
     } else if (fileName.includes('Gymnasiums') || fileName.includes('Libraries') || fileName.includes('cultural')) {
         // 青のピン (施設)
         marker = L.marker(latlng, { icon: bluePinIcon });
@@ -113,7 +114,8 @@ function createMarkerByFile(fileName, latlng, properties) {
     } else if (fileName.includes('Local_Toilet_Data')) {
         // トイレは赤丸
         marker = L.circleMarker(latlng, { color: 'red', fillColor: '#F44336', fillOpacity: 0.9, radius: 10, weight: 2 });
-        category = "救いの泉 (トイレ)";
+        // 👇 お行儀よく「トイレ」に統一！
+        category = "トイレ"; 
     } else {
         return null;
     }
@@ -170,13 +172,14 @@ function initUiEvents() {
         updateScanButtonState();
     });
 
-    document.getElementById('report-wc-btn').addEventListener('click', () => {
+document.getElementById('report-wc-btn').addEventListener('click', () => {
          if (!navigator.onLine) { alert("圏外だ！電波のある場所で送ってくれ！"); return; }
          if (!userLocationMarker) { alert("GPS待機中だ！"); return; }
          const pos = userLocationMarker.getLatLng();
-         window.location.href = `mailto:reso.synq+toilet@gmail.com?subject=救いの泉 レポート&body=緯度:${pos.lat} 経度:${pos.lng}`;
+         // 👇 メールの件名も「救いの泉 レポート」からお行儀よく修正！
+         window.location.href = `mailto:reso.synq+toilet@gmail.com?subject=トイレに関する連絡&body=緯度:${pos.lat} 経度:${pos.lng}`;
     });
-
+    
     const licenseOverlay = document.getElementById('license-overlay');
     document.getElementById('license-btn').addEventListener('click', () => {
         sidebar.classList.remove('open');

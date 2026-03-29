@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ヘルプ - 旅人の杖と救いの泉</title>
+    <link rel="icon" href="icon-512.jpg">
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f9f9f9; color: #333; line-height: 1.6; padding: 20px; max-width: 600px; margin: 0 auto; }
+        h1 { color: #111; font-size: 1.5rem; text-align: center; border-bottom: 2px solid #2196F3; padding-bottom: 10px; }
+        h2 { color: #2196F3; font-size: 1.2rem; margin-top: 30px; border-left: 4px solid #2196F3; padding-left: 10px; }
+        h3 { color: #444; font-size: 1.1rem; }
+        p, ul { font-size: 1rem; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        .pin-green { color: #4CAF50; font-weight: bold; }
+        .pin-blue { color: #2196F3; font-weight: bold; }
+        .pin-red { color: #F44336; font-weight: bold; }
+        .highlight { background-color: #fff9c4; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
+        .close-btn { display: block; width: 100%; padding: 15px; background-color: #333; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 40px; margin-bottom: 20px;}
+    </style>
+</head>
+<body>
+
+    <h1>❓ 探索マニュアル</h1>
+    <p>『旅人の杖と救いの泉』へようこそ。ここではアプリの基本的な使い方と機能について解説します。</p>
+
+    <h2>1. 基本の探索フロー</h2>
+    <ol>
+        <li><strong>地図を動かす:</strong> 探索したいエリアを表示するか、右下の「🎯」ボタンで現在地に飛びます。</li>
+        <li><strong>メニューを開く:</strong> 左上の「☰」ボタンから、探したい対象（緑・青）にチェックを入れます。</li>
+        <li><strong>スキャン実行:</strong> 画面下の<span class="highlight">周辺をスキャン</span>ボタンを押すと、候補がマップ上にピンとして出現します。</li>
+        <li><strong>詳細を見る:</strong> マップ上のピンをタップすると、名称やカテゴリーを確認できます。</li>
+    </ol>
+
+    <h2>2. 画面とボタンの見方</h2>
+    <ul>
+        <li><strong>「☰」 探索メニュー（左上）</strong><br>探したいジャンルをON/OFFできるフィルターです。</li>
+        <li><strong>「🎯」 現在地ボタン（右下）</strong><br>マップをスクロールして迷子になっても、ワンタップで自分の現在地（青いパルス）にカメラが戻ります。</li>
+        <li><strong>「周辺をスキャン」ボタン（下部）</strong><br>メインエンジンです。押した瞬間に画面内の候補を一斉に索敵します。<br>
+        <small>※広域すぎるとフリーズを防ぐためボタンが押せなくなります。地図を拡大してください。</small></li>
+    </ul>
+
+    <h2>3. ピンの色と種類</h2>
+    <ul>
+        <li class="pin-green">🟢 緑のピン（オブジェクト・公園）</li>
+        <p style="margin-top:0; font-size:0.9rem;">道標、古い境界標、登山マーカー、公衆時計、宗教施設・祠、史跡・記念碑、公園・遊具</p>
+        <li class="pin-blue">🔵 青のピン（公共施設）</li>
+        <p style="margin-top:0; font-size:0.9rem;">公共施設、図書館、文化財</p>
+        <li class="pin-red">🔴 赤い丸（トイレ）</li>
+        <p style="margin-top:0; font-size:0.9rem;">公衆トイレ（※トイレモード時のみ出現）</p>
+    </ul>
+
+    <h2>4. 🚾 トイレモード（緊急時のオアシス索敵）</h2>
+    <p>メニュー内の「トイレ」スイッチをONにすると、マップ上の候補がすべて消え、<strong>現在見えている範囲のトイレ（赤い丸）</strong>だけが浮かび上がります。</p>
+    <ul>
+        <li><strong>「新たな泉」の現地調査機能</strong><br>
+        トイレモード中に表示される「新たな泉 を現地調査」ボタンを押すと、あなたの現在地のGPS座標が自動で入力されたメールが立ち上がります。トイレの有無や状況を開発本部へ報告し、マップの精度向上にご協力ください。</li>
+    </ul>
+
+    <h2>5. 💡 より快適な探索のために</h2>
+    <p>本アプリは「PWA」に対応しています。ブラウザのメニュー（iOSは「共有ボタン」、Androidは右上の「︙」）から<strong>「ホーム画面に追加」</strong>を実行してください。<br>
+    URLバーが消え、全画面のネイティブアプリとしてより快適・高速に動作します！</p>
+
+    <a href="javascript:window.close();" class="close-btn">タブを閉じてマップへ戻る</a>
+
+</body>
+</html>

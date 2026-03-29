@@ -10,7 +10,7 @@ const CACHE_ASSETS = [
     './style.css',
     './app.js',
     './manifest.json',
-    './image_3.png', // ローディング画面の背景画像
+    './image_3.webp', // ローディング画面の背景画像
     './icon-512.jpg' // 👈 追加！最強のアプリアイコン
 ];
 

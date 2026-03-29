@@ -59,10 +59,14 @@ input:checked + .slider:before { transform: translateX(20px); }
 #ios-install-prompt { position: fixed; bottom: 20px; left: 5%; width: 90%; background: rgba(0,122,255,0.95); color: white; padding: 15px; border-radius: 10px; z-index: 4000; text-align: center; font-weight: bold; }
 .hidden { display: none !important; }
 
-/* SVGピン用の透過リセット＆立体化シャドウ */
+/* SVGピン用の透過リセット */
 .custom-svg-pin { 
     background: transparent; 
     border: none; 
-    /* 👇 この1行がピンの形に沿った美しい影を落とす魔法だ！ */
-    filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.4)); 
+}
+
+/* 👇 ピンのSVG本体に直接影をかける（これで確実に反映される！） */
+.custom-svg-pin svg {
+    filter: drop-shadow(2px 4px 4px rgba(0, 0, 0, 0.5));
+    overflow: visible;
 }

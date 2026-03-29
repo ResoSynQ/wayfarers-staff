@@ -1,343 +1,63 @@
-/* --- 🎨 共通設定 (野外視認性最優先) --- */
-body, html {
-    height: 100%;
-    margin: 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    overflow: hidden; /* ブラウザ全体のスクロールを禁止 */
-    background-color: #1a1a1a; /* ベースをダークに */
-    color: white;
-}
+/* --- 共通設定 --- */
+body, html { height: 100%; margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; overflow: hidden; background-color: #f0f0f0; }
+#map { height: 100%; width: 100%; z-index: 1; }
 
-#map {
-    height: 100%;
-    width: 100%;
-    z-index: 1; /* マップを一番下に */
-}
+/* --- ローディング画面 --- */
+#loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: url('image_3.png'); background-size: cover; background-position: center; z-index: 3000; display: flex; justify-content: center; align-items: flex-end; background-color: white; }
+#loading-content { text-align: center; padding-bottom: 10%; width: 90%; }
+.warning-text { color: black; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
+.loading-text { color: black; font-size: 1rem; font-weight: bold; }
+.loading-dots::after { content: ''; animation: dots 1.5s infinite; }
+@keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } 100% { content: ''; } }
+#loading-screen.loaded { display: none; }
 
-/* --- 🐉 至高のローディング画面 (image_3.pngを背景に設定) --- */
-#loading-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* 👇 あんたの用意したimage_3.pngをここに設定！ */
-    background-image: url('image_3.png');
-    background-size: cover; /* 画面いっぱいに広げる */
-    background-position: center; /* 中央に配置 */
-    background-repeat: no-repeat;
-    z-index: 1000; /* 全ての上に表示 */
-    display: flex;
-    justify-content: center;
-    align-items: flex-end; /* テキストを下部に配置 */
-    background-color: white; /* 画像が読み込まれるまでのバックアップ */
-}
+/* --- 現在地ボタン --- */
+#locate-btn { position: absolute; bottom: 80px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; font-size: 1.5rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; }
 
-#loading-content {
-    text-align: center;
-    padding-bottom: 10%; /* 下部から少し浮かせる */
-    width: 90%;
-}
+/* --- 🎛️ サイドバー (メニューボタン隠れない問題解決) --- */
+#sidebar { position: absolute; top: 0; left: 0; height: 100%; z-index: 2000; display: flex; pointer-events: none; }
+#sidebar.open { pointer-events: auto; }
 
-.warning-text {
-    color: black; /* シルエットと合わせて黒文字 */
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.8); /* 白フチで視認性確保 */
-}
+#sidebar-content { width: 280px; height: 100%; background-color: rgba(255, 255, 255, 0.95); color: #111; pointer-events: auto; transform: translateX(-100%); transition: transform 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.2); overflow-y: auto; padding: 20px; box-sizing: border-box;}
+#sidebar.open #sidebar-content { transform: translateX(0); }
 
-.loading-text {
-    color: black;
-    font-size: 1rem;
-    font-weight: bold;
-}
+/* 三本線ボタンを独立して動かす */
+#sidebar-toggle { pointer-events: auto; position: absolute; top: 15px; left: 15px; width: 45px; height: 45px; background: white; color: black; border: 2px solid #ccc; border-radius: 8px; font-size: 1.5rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: left 0.3s ease; z-index: 2001; }
+#sidebar.open #sidebar-toggle { left: 295px; } /* メニュー幅より少し右に移動 */
 
-/* ドットアニメーションの魔法 */
-.loading-dots::after {
-    content: '';
-    animation: loading-animation 1.5s infinite;
-}
+/* メニュー内テキストスタイル */
+.menu-title { margin-top: 0; font-size: 1.3rem; color: #333; }
+.menu-group label { display: block; padding: 8px 0; cursor: pointer; font-size: 1.1rem; }
+.text-green { color: #2E7D32; font-weight: bold; }
+.text-blue { color: #1565C0; font-weight: bold; }
+.text-black { color: #333; font-weight: bold; }
+.menu-divider { border: 0; border-top: 1px solid #ddd; margin: 15px 0; }
+.text-left { display: block; width: 100%; text-align: left; padding: 10px 0; background: none; border: none; font-size: 1.1rem; cursor: pointer; text-decoration: none; }
 
-@keyframes loading-animation {
-    0%   { content: ''; }
-    25%  { content: '.'; }
-    50%  { content: '..'; }
-    75%  { content: '...'; }
-    100% { content: ''; }
-}
+/* トグルスイッチ */
+.switch-label { display: flex !important; justify-content: space-between; align-items: center; }
+.toggle-wrapper { display: flex; align-items: center; gap: 10px; }
+.toggle-text { font-size: 0.9rem; color: #888; }
+.switch-label input { opacity: 0; width: 0; height: 0; display: none; }
+.slider { position: relative; display: inline-block; width: 44px; height: 24px; background-color: #ccc; border-radius: 24px; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .4s; }
+input:checked + .slider { background-color: #F44336; }
+input:checked + .slider:before { transform: translateX(20px); }
 
-/* ローディング完了時に非表示にするクラス */
-#loading-screen.loaded {
-    display: none;
-}
+/* --- 🌐 アクションボタン (青統一) --- */
+#action-bar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 400px; text-align: center; }
+#scan-btn { width: 100%; padding: 15px; background-color: #2196F3; color: white; border: none; border-radius: 30px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 15px rgba(33, 150, 243, 0.5); cursor: pointer; transition: 0.2s; }
+#scan-btn:active { background-color: #1976D2; }
+#scan-btn:disabled { background-color: #999; box-shadow: none; cursor: not-allowed; }
+#report-wc-btn { background-color: #F44336; width: 100%; padding: 15px; color: white; border: none; border-radius: 30px; font-size: 1.1rem; font-weight: bold; box-shadow: 0 4px 15px rgba(244, 67, 54, 0.5); margin-top: 10px; cursor: pointer; }
 
-/* --- 🎯 現在地復帰ボタン --- */
-#locate-btn {
-    position: absolute;
-    bottom: 80px; /* アクションバーの上に配置 */
-    right: 20px;
-    z-index: 100;
-    width: 50px;
-    height: 50px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/* オーバーレイ等 */
+#license-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; display: flex; justify-content: center; align-items: center; }
+#license-content { width: 90%; height: 80%; background: white; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+#license-close-btn { padding: 15px; background: #333; color: white; border: none; font-size: 1.1rem; cursor: pointer; }
+#license-text { padding: 20px; overflow-y: auto; color: #333; line-height: 1.6; }
+#ios-install-prompt { position: fixed; bottom: 20px; left: 5%; width: 90%; background: rgba(0,122,255,0.95); color: white; padding: 15px; border-radius: 10px; z-index: 4000; text-align: center; font-weight: bold; }
+.hidden { display: none !important; }
 
-/* --- 🎛️ 左サイド・コントロールパネル（メニュー） --- */
-#sidebar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    z-index: 200; /* マップの上に表示 */
-    display: flex;
-}
-
-#sidebar-toggle {
-    width: 50px;
-    height: 50px;
-    background-color: rgba(26, 26, 26, 0.9);
-    color: white;
-    border: none;
-    border-radius: 0 0 10px 0;
-    font-size: 1.5rem;
-    cursor: pointer;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.3);
-}
-
-#sidebar-content {
-    width: 280px; /* 片手操作しやすい幅 */
-    height: 100%;
-    background-color: rgba(26, 26, 26, 0.95);
-    color: white;
-    overflow-y: auto; /* メニューが多い場合にスクロールさせる */
-    padding: 20px;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.3);
-    transform: translateX(-100%); /* 初期は隠しておく */
-    transition: transform 0.3s ease; /* スライドのアニメーション */
-}
-
-#sidebar.open #sidebar-content {
-    transform: translateX(0); /* 開いた時は元の位置へ */
-}
-
-#sidebar-content h2, #sidebar-content h3 {
-    margin-top: 0;
-}
-
-.menu-group {
-    margin-bottom: 20px;
-    font-size: 1rem;
-}
-
-.menu-group label {
-    display: inline-block;
-    padding: 5px 0;
-    cursor: pointer;
-    width: 100%; /* タップ領域を広げる */
-}
-
-/* ピンの色分け (メニューのテキストカラーで表現) */
-.menu-group h3, .menu-group input[type="checkbox"] + span {
-    color: #4CAF50; /* 緑 (史跡・公園) */
-}
-.menu-group.group-blue h3, .menu-group.group-blue input[type="checkbox"] + span {
-    color: #2196F3; /* 青 (公共施設) */
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid #444;
-    margin: 15px 0;
-}
-
-#license-btn, #help-link {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #333;
-    color: white;
-    border: none;
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
-}
-
-/* --- 🚻 トイレモードスイッチ (iOS風のトグル) --- */
-.switch-label {
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    color: #F44336 !important; /* トイレモードは赤 */
-    font-weight: bold;
-}
-
-.switch-label input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-    background-color: #555;
-    border-radius: 24px;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    border-radius: 50%;
-    transition: .4s;
-}
-
-input:checked + .slider {
-    background-color: #F44336; /* ONになったら赤 */
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-/* --- 🌐 「周辺をスキャン」機能（索敵レーダー） / 「新たな泉」現地調査ボタン --- */
-#action-bar {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%); /* 中央配置 */
-    z-index: 100;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-}
-
-#scan-btn, #report-wc-btn {
-    width: 100%;
-    padding: 15px;
-    background-color: #FF5722; /* 索敵はオレンジ */
-    color: white;
-    border: none;
-    border-radius: 30px; /* 片手で押しやすい丸い大きなボタン */
-    font-size: 1.2rem;
-    font-weight: bold;
-    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.5);
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-#scan-btn:active {
-    background-color: #E64A19;
-}
-
-/* スキャンボタンが無効（グレーアウト）の時のスタイル (クラッシュ防止) */
-#scan-btn:disabled {
-    background-color: #555;
-    box-shadow: none;
-    cursor: not-allowed;
-    color: #888;
-}
-
-/* 「新たな泉」報告ボタン (トイレモード時) */
-#report-wc-btn {
-    background-color: #F44336; /* トイレ報告は赤 */
-    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.5);
-    margin-top: 10px; /* スキャンボタンの下に配置 */
-}
-
-/* --- 📜 ライセンスの表示用オーバーレイ --- */
-#license-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(26, 26, 26, 0.95);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#license-content {
-    width: 90%;
-    height: 90%;
-    background-color: #1a1a1a;
-    border-radius: 10px;
-    border: 1px solid #444;
-    overflow: hidden; /* 子要素のスクロールを制御 */
-    display: flex;
-    flex-direction: column;
-}
-
-#license-close-btn {
-    width: 100%;
-    padding: 15px;
-    background-color: #FF5722;
-    color: white;
-    border: none;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#license-text {
-    flex: 1;
-    overflow-y: auto; /* ライセンス本文だけをスクロール */
-    padding: 20px;
-    font-size: 0.9rem;
-    color: #ccc;
-    line-height: 1.6;
-}
-
-/* --- 🍎 iPhoneユーザー用 インストール誘導吹き出し --- */
-#ios-install-prompt {
-    position: fixed;
-    bottom: 20px; /* Safariのメニューバーを避ける */
-    left: 5%;
-    width: 90%;
-    background-color: rgba(0, 122, 255, 0.95); /* iOSの青 */
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    font-size: 0.9rem;
-    font-weight: bold;
-    text-align: center;
-}
-
-#ios-install-prompt::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 10px 10px 0;
-    border-style: solid;
-    border-color: rgba(0, 122, 255, 0.95) transparent transparent;
-}
-
-/* ---  Utility Classes --- */
-.hidden {
-    display: none !important;
-}
+/* SVGピン用の透過リセット */
+.custom-svg-pin { background: transparent; border: none; }

@@ -93,10 +93,11 @@ function updateScanButtonState() {
     const scanBtn = document.getElementById('scan-btn');
     if (map.getZoom() < SCAN_ZOOM_THRESHOLD) {
         scanBtn.disabled = true;
-        scanBtn.innerText = "もっと近づいてスキャン";
+        scanBtn.innerText = "もっと近づいてサーチ"; // ここも少し柔らかく「サーチ」に
     } else {
         scanBtn.disabled = false;
-        scanBtn.innerText = isToiletMode ? "トイレをスキャン" : "周辺をスキャン";
+        // 👇 ここが重要！「トイレをスキャン」から「トイレを探す」へ
+        scanBtn.innerText = isToiletMode ? "トイレを探す" : "周辺をスキャン";
     }
 }
 

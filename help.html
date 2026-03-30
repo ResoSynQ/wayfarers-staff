@@ -9,7 +9,6 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f9f9f9; color: #333; line-height: 1.6; padding: 20px; max-width: 600px; margin: 0 auto; }
         h1 { color: #111; font-size: 1.5rem; text-align: center; border-bottom: 2px solid #2196F3; padding-bottom: 10px; }
         h2 { color: #2196F3; font-size: 1.2rem; margin-top: 30px; border-left: 4px solid #2196F3; padding-left: 10px; }
-        h3 { color: #444; font-size: 1.1rem; }
         p, ul, ol { font-size: 1rem; }
         ul, ol { padding-left: 20px; }
         li { margin-bottom: 8px; }
@@ -19,6 +18,7 @@
         .desc { font-weight: normal; font-size: 0.9rem; color: #666; margin-bottom: 15px; display: block; }
         .highlight { background-color: #fff9c4; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
         .close-btn { display: block; width: 100%; padding: 15px; background-color: #333; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 40px; margin-bottom: 20px; border: none; cursor: pointer; font-size: 1rem; }
+        .warning-box { background-color: #ffebee; border: 1px solid #f44336; padding: 10px; border-radius: 5px; font-size: 0.9rem; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -51,15 +51,22 @@
         <span class="desc">公共施設、図書館、文化センター、体育館、運動広場、国指定文化財など、主に建物や指定を受けた施設を指します。</span>
         
         <li class="pin-red">⭕ 赤い丸（トイレ）</li>
-        <span class="desc">公衆トイレ。トイレモード時のみ出現する「救いの泉」です。</span>
+        <span class="desc">公衆トイレ。トイレモード時のみ出現します。</span>
     </ul>
 
     <h2>4. 🚾 トイレモード</h2>
     <p>メニュー内の「トイレ」スイッチをONにすると、通常の探索ピンがすべて消え、<strong>現在見えている範囲のトイレ（赤い丸）</strong>だけが浮かび上がります。</p>
+    
+    <h3>■ トイレの現地調査機能</h3>
+    <p>トイレモード中に表示される「トイレについて連絡」ボタンを押すと、現在地の座標が入力されたメールが立ち上がります。状況を開発へ報告することができます。</p>
     <ul>
-        <li><strong>「救いの泉」の現地調査機能</strong><br>
-        トイレモード中に表示される「トイレについて連絡」ボタンを押すと、あなたの現在地の座標が入力されたメールが立ち上がります。状況を開発へ報告し、マップの精度向上にご協力いただけますと幸いです。</li>
+        <li>例：「トイレがなかった」</li>
+        <li>「マップに載っていないトイレがあった」</li>
+        <li>「トイレが壊れている」</li>
     </ul>
+    <div class="warning-box">
+        ※不審物や緊急の状況を見かけた際は警察・救急へご連絡ください。
+    </div>
 
     <h2>5. 💡 より快適な探索のために</h2>
     <p>本アプリは「PWA」に対応しています。ブラウザのメニューから<strong>「ホーム画面に追加」</strong>を実行してください。全画面でより高速に動作します！</p>
@@ -69,7 +76,7 @@
         <li><strong>📱 アイコンの削除</strong><br>
         ホーム画面のアイコンを長押しして削除するだけで簡単に消去できます。</li>
         <li><strong>⚠️ キャッシュの保持を推奨</strong><br>
-        このアプリは初回起動時にデータを「キャッシュ」に保存します。これにより<strong>素早く検索をすることが可能になっています。</strong>になります。キャッシュをは残しておくことを推奨しますが端末が遅くなった場合は削除して下さい。</li>
+        このアプリは初回起動時にデータを「キャッシュ」に保存します。これにより素早く周囲のサーチが可能となっています。端末が重くなった場合はブラウザの履歴消去などでキャッシュを消すと動作の改善が見込めます。</li>
     </ul>
 
     <button onclick="window.close();" class="close-btn">タブを閉じてマップへ戻る</button>

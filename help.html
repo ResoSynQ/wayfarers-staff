@@ -10,14 +10,15 @@
         h1 { color: #111; font-size: 1.5rem; text-align: center; border-bottom: 2px solid #2196F3; padding-bottom: 10px; }
         h2 { color: #2196F3; font-size: 1.2rem; margin-top: 30px; border-left: 4px solid #2196F3; padding-left: 10px; }
         h3 { color: #444; font-size: 1.1rem; }
-        p, ul { font-size: 1rem; }
-        ul { padding-left: 20px; }
+        p, ul, ol { font-size: 1rem; }
+        ul, ol { padding-left: 20px; }
         li { margin-bottom: 8px; }
-        .pin-green { color: #4CAF50; font-weight: bold; }
         .pin-blue { color: #2196F3; font-weight: bold; }
+        .pin-green { color: #4CAF50; font-weight: bold; }
         .pin-red { color: #F44336; font-weight: bold; }
+        .desc { font-weight: normal; font-size: 0.9rem; color: #666; margin-bottom: 15px; display: block; }
         .highlight { background-color: #fff9c4; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
-        .close-btn { display: block; width: 100%; padding: 15px; background-color: #333; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 40px; margin-bottom: 20px;}
+        .close-btn { display: block; width: 100%; padding: 15px; background-color: #333; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 40px; margin-bottom: 20px; border: none; cursor: pointer; font-size: 1rem; }
     </style>
 </head>
 <body>
@@ -28,7 +29,7 @@
     <h2>1. 基本の探索フロー</h2>
     <ol>
         <li><strong>地図を動かす:</strong> 探索したいエリアを表示するか、右下の「🎯」ボタンで現在地に飛びます。</li>
-        <li><strong>メニューを開く:</strong> 左上の「☰」ボタンから、探したい対象（緑・青）にチェックを入れます。</li>
+        <li><strong>メニューを開く:</strong> 左上の「☰」ボタンから、探したい対象（青・緑）にチェックを入れます。</li>
         <li><strong>スキャン実行:</strong> 画面下の<span class="highlight">周辺をスキャン</span>ボタンを押すと、候補がマップ上にピンとして出現します。</li>
         <li><strong>詳細を見る:</strong> マップ上のピンをタップすると、名称やカテゴリーを確認できます。</li>
     </ol>
@@ -36,44 +37,42 @@
     <h2>2. 画面とボタンの見方</h2>
     <ul>
         <li><strong>「☰」 探索メニュー（左上）</strong><br>探したいジャンルをON/OFFできるフィルターです。</li>
-        <li><strong>「🎯」 現在地ボタン（右下）</strong><br>マップをスクロールして迷子になっても、ワンタップで自分の現在地（青いパルス）にカメラが戻ります。</li>
+        <li><strong>「🎯」 現在地ボタン（右下）</strong><br>マップをスクロールして迷子になっても、ワンタップで自分の現在地にカメラが戻ります。</li>
         <li><strong>「周辺をスキャン」ボタン（下部）</strong><br>メインエンジンです。押した瞬間に画面内の候補を一斉に索敵します。<br>
-        <small>※広域すぎるとフリーズを防ぐためボタンが押せなくなります。地図を拡大してください。</small></li>
+        <small>※広域すぎると負荷軽減のためボタンが押せなくなります。地図を拡大してください。</small></li>
     </ul>
 
-<h2>3. マップ上のピンについて</h2>
+    <h2>3. マップ上のピンについて</h2>
     <ul>
-        <li style="color: #2196F3;">🔵 青いピン（歴史・宗教・公園）</li>
-        <p class="desc">道標、境界標、登山マーカー、公衆時計、祠・寺社、史跡・記念碑、公園・遊具など、主に屋外の探索対象を指します。</p>
+        <li class="pin-blue">🔵 青いピン（歴史・宗教・公園）</li>
+        <span class="desc">道標、境界標、登山マーカー、公衆時計、祠・寺社、史跡・記念碑、公園・遊具など、主に屋外の探索対象を指します。</span>
         
-        <li style="color: #4CAF50;">🟢 緑のピン（公共・文化・体育）</li>
-        <p class="desc">公共施設、図書館、文化センター、体育館、運動広場、国指定文化財など、主に建物や指定を受けた施設を指します。</p>
+        <li class="pin-green">🟢 緑のピン（公共・文化・体育）</li>
+        <span class="desc">公共施設、図書館、文化センター、体育館、運動広場、国指定文化財など、主に建物や指定を受けた施設を指します。</span>
         
-        <li style="color: #F44336;">⭕ 赤い丸（トイレ）</li>
-        <p class="desc">公衆トイレ。トイレモード時のみ出現する「救いの泉」です。</p>
+        <li class="pin-red">⭕ 赤い丸（トイレ）</li>
+        <span class="desc">公衆トイレ。トイレモード時のみ出現する「救いの泉」です。</span>
     </ul>
 
-    <h2>4. 🚾 トイレモード </h2>
-    <p>メニュー内の「トイレ」スイッチをONにすると、マップ上の候補がすべて消え、<strong>現在見えている範囲のトイレ（赤い丸）</strong>だけが浮かび上がります。</p>
+    <h2>4. 🚾 トイレモード</h2>
+    <p>メニュー内の「トイレ」スイッチをONにすると、通常の探索ピンがすべて消え、<strong>現在見えている範囲のトイレ（赤い丸）</strong>だけが浮かび上がります。</p>
     <ul>
-        <li><strong>「新たな泉」の現地調査機能</strong><br>
-        トイレモード中に表示される「新たな泉 を現地調査」ボタンを押すと、あなたの現在地のGPS座標が自動で入力されたメールが立ち上がります。トイレの有無や状況を開発へ報告できるようになっています。マップの精度向上にご協力いただけますと幸いです。</li>
+        <li><strong>「救いの泉」の現地調査機能</strong><br>
+        トイレモード中に表示される「トイレについて連絡」ボタンを押すと、あなたの現在地の座標が入力されたメールが立ち上がります。状況を開発へ報告し、マップの精度向上にご協力いただけますと幸いです。</li>
     </ul>
 
     <h2>5. 💡 より快適な探索のために</h2>
-    <p>本アプリは「PWA」に対応しています。ブラウザのメニュー（iOSは「共有ボタン」、Androidは右上の「︙」）から<strong>「ホーム画面に追加」</strong>を実行してください。<br>
-    URLバーが消え、全画面のネイティブアプリとしてより快適・高速に動作します！</p>
+    <p>本アプリは「PWA」に対応しています。ブラウザのメニューから<strong>「ホーム画面に追加」</strong>を実行してください。全画面でより高速に動作します！</p>
 
-    <h2>6. アプリの削除とデータ（キャッシュ）について</h2>
+    <h2>6. アプリの削除とデータについて</h2>
     <ul>
-        <li><strong>📱 アプリ（アイコン）の削除方法</strong><br>
-        ホーム画面に追加したアイコンは、通常のアプリと同じように長押しして「ブックマークを削除（iOS）」または「アンインストール / 削除（Android）」を選ぶだけで、いつでも簡単に消去できます。</li>
-        <li><strong>⚠️ キャッシュは残しておくのがオススメ！</strong><br>
-        このアプリは初回起動時に、広範囲のポータル候補データ（数万件）をスマホの「キャッシュ（一時保存領域）」に記憶させます。これにより、2回目以降は<strong>圏外でも爆速で索敵が可能</strong>になります。<br>
-        スマホの設定からブラウザの「閲覧履歴やキャッシュ（サイトデータ）を消去」してしまうと、次回起動時に大量のデータを再度ダウンロードし直す必要があるため、快適にプレイし続けるには<strong>キャッシュは消さずに残しておくこと</strong>を強く推奨します！</li>
+        <li><strong>📱 アイコンの削除</strong><br>
+        ホーム画面のアイコンを長押しして削除するだけで簡単に消去できます。</li>
+        <li><strong>⚠️ キャッシュの保持を推奨</strong><br>
+        このアプリは初回起動時にデータを「キャッシュ」に保存します。これにより<strong>圏外でも爆速で索敵が可能</strong>になります。ブラウザの履歴消去などでキャッシュを消すと再ダウンロードが必要になるため、残しておくことを強く推奨します！</li>
     </ul>
 
-    <a href="javascript:window.close();" class="close-btn">タブを閉じてマップへ戻る</a>
+    <button onclick="window.close();" class="close-btn">タブを閉じてマップへ戻る</button>
 
 </body>
 </html>

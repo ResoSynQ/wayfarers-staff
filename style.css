@@ -4,87 +4,63 @@ body, html, #map {
     font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* ☰ メニューボタンの絶対固定（今回の重要ポイント） */
-#menu-btn {
+/* 📱 画面上の固定ボタン群 */
+#menu-btn, #scan-btn, #help-btn {
     position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 9999; /* マップのコントロールより手前に */
+    z-index: 9999;
     background: white;
-    border: none;
+    border: 2px solid rgba(0,0,0,0.2);
     border-radius: 8px;
-    width: 45px;
-    height: 45px;
-    font-size: 24px;
+    height: 40px;
+    font-weight: bold;
     cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    padding: 0 10px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* ⏳ ローディング画面（白背景モダン） */
+/* 各ボタンの配置位置 */
+#menu-btn { top: 15px; left: 15px; width: 45px; font-size: 20px; }
+#scan-btn { top: 15px; right: 15px; font-size: 14px; }
+#help-btn { top: 65px; right: 15px; font-size: 14px; }
+
+/* 🚨 メニュー内のチェックボックスとアイコンを「必ず横並び」にする魔法 */
+.leaflet-control-layers-overlays label > div {
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 5px;
+    white-space: nowrap; /* テキストの変な改行を防ぐ */
+}
+.leaflet-control-layers-overlays input[type="checkbox"] {
+    margin: 0 8px 0 0 !important; /* チェックボックスの右に余白 */
+    flex-shrink: 0; /* チェックボックスが潰れないようにする */
+}
+
+/* ⏳ ローディング画面 */
 #loading-screen {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 100000;
-    transition: opacity 0.8s ease;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    z-index: 100000; transition: opacity 0.8s ease;
 }
+#loading-logo { max-width: 250px; margin-bottom: 30px; }
+.warning-text { color: #444; font-size: 0.9rem; line-height: 1.6; text-align: center; padding: 0 25px; margin-bottom: 20px; }
 
-#loading-logo {
-    max-width: 250px;
-    margin-bottom: 30px;
-}
-
-.warning-text {
-    color: #444;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    text-align: center;
-    padding: 0 25px;
-    margin-bottom: 20px;
-}
-
-.loading-text {
-    color: #888;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-/* 📜 ライセンスモーダル */
+/* 📜 モーダル（ヘルプ用） */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 10001;
+    display: none; position: fixed; z-index: 10001;
     left: 0; top: 0; width: 100%; height: 100%;
     background-color: rgba(0,0,0,0.6);
 }
-
 .modal-content {
-    background-color: white;
-    margin: 10% auto;
-    padding: 25px;
-    width: 85%;
-    max-height: 70vh;
-    overflow-y: auto;
-    border-radius: 12px;
-    line-height: 1.6;
-    font-size: 0.9rem;
+    background-color: white; margin: 15% auto; padding: 20px;
+    width: 80%; max-height: 70vh; overflow-y: auto;
+    border-radius: 12px; line-height: 1.6;
 }
+.close-btn { float: right; font-size: 24px; font-weight: bold; cursor: pointer; }
 
-.close-btn {
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* Leaflet標準のレイヤーコントロールのカスタマイズ */
-.leaflet-control-layers {
-    margin-top: 70px !important; /* ボタンと被らないように */
-}
+/* メニューパネル自体の位置調整 */
+.leaflet-control-layers { margin-top: 70px !important; margin-left: 15px !important; }
+.leaflet-left .leaflet-control { margin-left: 0; }

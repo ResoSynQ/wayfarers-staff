@@ -9,28 +9,23 @@
     <title>旅人の杖と救いの泉</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
-    <link rel="stylesheet" href="style.css?v=2.0.9" />
+    <link rel="stylesheet" href="style.css?v=2.0.10" />
 </head>
 <body>
     <button id="menu-btn" title="メニュー">☰</button>
-    
     <button id="location-btn" title="現在地へ移動">🧭</button>
-    
     <button id="scan-btn" class="disabled" disabled>もっと近づいてスキャン</button>
 
     <button id="help-btn" class="floating-btn" title="ヘルプ">❓</button>
-    
     <button id="license-btn" class="floating-btn" title="ライセンス">📜</button>
 
     <div id="loading-screen">
         <img src="image_3.webp" id="loading-logo" alt="旅人の杖 ロゴ">
-        
         <p class="warning-text">
             このアプリは探索の補助を目的としたツールです。<br>
             収録されているデータはスポットの適性や正確性を保証するものではありません。<br>
             周囲に注意して、安全を心掛けプレイしましょう。
         </p>
-        
         <div class="loading-status">
             <span class="loading-text">探索の準備中</span>
             <span class="loading-dots">...</span>
@@ -39,19 +34,7 @@
 
     <div id="map"></div>
 
-    <div id="help-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" id="close-help">&times;</span>
-            <h2>旅人の杖 使い方</h2>
-            <p>1. <b>左上の「☰」ボタン</b>から、見つけたい情報のレイヤーをONにしてください。</p>
-            <p>2. マップをズームし、<b>画面下の「周囲をスキャン」ボタン</b>を押すと、その範囲のデータが出現します。</p>
-            <p>3. <b>アイコンをタップ</b>すると、その場所の名前が表示されます。</p>
-            <p>※上級者ルートや飲食店を利用する際は、周囲の安全や最新の営業状況にご注意ください。</p>
-        </div>
-    </div>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <script src="app.js?v=2.0.9"></script>
+    <script src="app.js?v=2.0.10"></script>
 </body>
 </html>

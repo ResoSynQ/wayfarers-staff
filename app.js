@@ -1,221 +1,230 @@
 /**
- * --- 『旅人の杖と救いの泉』 Logic Core (Ver 1.1) ---
- * 黄金のCSVデータ & 配色ルール 統合版
+ * 旅人の杖と救いの泉 Ver 2.0
+ * 心臓部：app.js (アイコン・色分け完全分離版)
  */
 
-// 1. 📂 黄金のデータファイル群 (短縮名に統一)
-const GEOJSON_FILES = [
-    'rel.geojson',  // 🔵 歴史・宗教・道標
-    'park.geojson', // 🔵 公園・遊具
-    'com.geojson',  // 🟢 公共施設
-    'mus.geojson',  // 🟢 文化施設
-    'gym.geojson',  // 🟢 体育館
-    'cul.geojson',  // 🟢 文化財
-    'wc.geojson'    // 🔴 トイレ (赤丸)
-];
+// --- 1. マップの初期化 ---
+const map = L.map('map', {
+    center: [34.6937, 135.5023], // 大阪周辺
+    zoom: 13,
+    maxZoom: 19, // ズーム限界突破
+    zoomControl: false // 標準コントロールを消して独自ボタンに合わせる
+});
 
-const SCAN_ZOOM_THRESHOLD = 15; 
-let map, userLocationMarker;
-let isToiletMode = false;
-const rawDataCache = {}; 
-const activeMarkersGroup = L.layerGroup(); 
+// ベースマップ（OpenStreetMap）
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 
-// 2. 🎨 ピンの生成 (ドロップシャドウ付き)
-function createPinIcon(color) {
-    // style.css の .custom-svg-pin svg { filter: drop-shadow(...) } が適用される
-    const svg = `<svg width="28" height="41" viewBox="0 0 28 41" xmlns="http://www.w3.org/2000/svg"><path d="M14 0C6.268 0 0 6.268 0 14c0 9.844 14 27 14 27s14-17.156 14-27C28 6.268 21.732 0 14 0zm0 20c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" fill="${color}" stroke="#fff" stroke-width="1.5"/></svg>`;
-    return L.divIcon({ 
-        className: 'custom-svg-pin', 
-        html: svg, 
-        iconSize: [28, 41], 
-        iconAnchor: [14, 41], 
-        popupAnchor: [0, -41] 
-    });
-}
-
-// 固定色の定義
-const bluePinIcon = createPinIcon('#2196F3');  // 🔵 歴史・公園系
-const greenPinIcon = createPinIcon('#4CAF50'); // 🟢 公共・文化系
-
-window.onload = function() {
-    // 初期表示：大阪近辺 (適宜変更可)
-    map = L.map('map', { zoomControl: false }).setView([34.6937, 135.5022], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-        attribution: '© OSM contributors' 
-    }).addTo(map);
-    
-    activeMarkersGroup.addTo(map);
-    initGeolocation();
-    loadGeoJsonData();
-    initUiEvents();
-    
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(() => {
-            console.log("👷 SW: 杖の魔力(キャッシュ)が充填された。");
-        });
-    }
+// --- 2. アイコンの定義 ---
+const icons = {
+    blue: new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    }),
+    green: new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    }),
+    purple: new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    }),
+    orange: new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+    })
 };
 
-// 3. 🛰️ GPS制御
-function initGeolocation() {
-    if (!navigator.geolocation) return;
-    const dot = L.divIcon({ 
-        className: 'user-dot', 
-        html: '<div style="width:16px;height:16px;background:#2196F3;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>', 
-        iconSize: [22, 22] 
-    });
-    navigator.geolocation.watchPosition((pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords;
-        if (userLocationMarker) {
-            userLocationMarker.setLatLng([lat, lng]);
-        } else {
-            userLocationMarker = L.marker([lat, lng], { icon: dot }).addTo(map);
-        }
-    }, null, { enableHighAccuracy: true });
-}
+// --- 3. データレイヤーの準備 (全ファイル独立) ---
+const layers = {
+    // 【基本探索】
+    rel: L.layerGroup(),
+    park: L.layerGroup(),
+    com: L.layerGroup(),
+    mus: L.layerGroup(),
+    gym: L.layerGroup(),
+    cul: L.layerGroup(),
+    wc: L.layerGroup(),
 
-// 4. 📦 データロード
-async function loadGeoJsonData() {
-    const promises = GEOJSON_FILES.map(async (f) => {
-        try { 
-            const res = await fetch(f); 
-            if (res.ok) rawDataCache[f] = await res.json(); 
-        } catch (e) {
-            console.error(`❌ ${f} の召喚に失敗:`, e);
-        }
-    });
-    await Promise.all(promises);
-    document.getElementById('loading-screen').classList.add('loaded');
-}
+    // 【探索候補・広域地域データ】
+    keikan: L.layerGroup(),
+    tree: L.layerGroup(),
+    fudo: L.layerGroup(),
+    denken: L.layerGroup(),
+    fuchi: L.layerGroup(),
+    kanko: L.layerGroup(),
+    restaurants: L.layerGroup(),
 
-// 5. 🔍 スキャンボタンの状態更新
-function updateScanButtonState() {
-    const scanBtn = document.getElementById('scan-btn');
-    if (map.getZoom() < SCAN_ZOOM_THRESHOLD) {
-        scanBtn.disabled = true;
-        scanBtn.innerText = "もっと近づいてサーチ"; // ここも少し柔らかく「サーチ」に
-    } else {
-        scanBtn.disabled = false;
-        // 👇 ここが重要！「トイレをスキャン」から「トイレを探す」へ
-        scanBtn.innerText = isToiletMode ? "トイレを探す" : "周辺をスキャン";
-    }
-}
+    // 【上級者向け】
+    trail: L.layerGroup(),
+    shizenhodo: L.layerGroup(),
+    gokaido: L.layerGroup()
+};
 
-// 6. 🪄 周辺スキャン実行
-function scanSurrounding() {
-    activeMarkersGroup.clearLayers();
-    const bounds = map.getBounds();
-    
-    // サイドバーのチェックボックス状態を取得
-    const activeFiles = Array.from(document.querySelectorAll('.category-toggle:checked'))
-                            .map(cb => cb.getAttribute('data-file'));
-    
-    // トイレモードか通常モードかで対象を切り替え
-    const targetFiles = isToiletMode ? ['wc.geojson'] : GEOJSON_FILES.filter(f => f !== 'wc.geojson');
-
-    targetFiles.forEach(f => {
-        if (!isToiletMode && !activeFiles.includes(f)) return;
-        
-        const data = rawDataCache[f];
-        if (!data || !data.features) return;
-
-        data.features.forEach(feature => {
-            const c = feature.geometry.coordinates;
-            // GeoJSONは [lng, lat] なので [1, 0] で判定
-            if (bounds.contains([c[1], c[0]])) {
-                const m = createMarkerByFile(f, [c[1], c[0]], feature.properties);
-                if (m) activeMarkersGroup.addLayer(m);
+// --- 4. GeoJSON読み込み・描写関数 ---
+async function loadPointData(url, layerGroup, icon, popupTemplate) {
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        L.geoJSON(data, {
+            pointToLayer: (feature, latlng) => {
+                if (url.includes('wc.geojson')) {
+                    // トイレは赤丸
+                    return L.circleMarker(latlng, { radius: 6, fillColor: 'red', color: '#fff', weight: 2, fillOpacity: 0.8 });
+                }
+                return L.marker(latlng, { icon: icon });
+            },
+            onEachFeature: (feature, layer) => {
+                let name = feature.properties.name || feature.properties.名称 || "名称未定";
+                layer.bindPopup(`<strong>${name}</strong><br>${popupTemplate || ""}`);
             }
-        });
-    });
+        }).addTo(layerGroup);
+    } catch (e) { console.error(`Failed to load ${url}:`, e); }
 }
 
-// 7. 📍 マーカー生成 (配色統合ロジック)
-function createMarkerByFile(fileName, latlng, props) {
-    let marker, category = "";
-    const name = props.name || "名称不明の地点";
+async function loadGeometryData(url, layerGroup, style) {
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        L.geoJSON(data, {
+            style: style,
+            onEachFeature: (feature, layer) => {
+                let name = feature.properties.name || feature.properties.名称 || "指定区域";
+                layer.bindPopup(`<strong>${name}</strong>`);
+            }
+        }).addTo(layerGroup);
+    } catch (e) { console.error(`Failed to load ${url}:`, e); }
+}
 
-    // A. トイレ (赤い丸)
-    if (fileName === 'wc.geojson') {
-        marker = L.circleMarker(latlng, { 
-            color: 'red', 
-            fillColor: '#F44336', 
-            fillOpacity: 0.9, 
-            radius: 10, 
-            weight: 2 
-        });
-        category = "公衆トイレ";
-    } 
-    // B. 歴史・宗教・公園系 (青ピン)
-    else if (fileName === 'rel.geojson' || fileName === 'park.geojson') {
-        marker = L.marker(latlng, { icon: bluePinIcon });
-        category = fileName === 'rel.geojson' ? "歴史・宗教・道標" : "公園・遊具";
-    } 
-    // C. 公共・体育・文化系 (緑ピン)
-    else {
-        marker = L.marker(latlng, { icon: greenPinIcon });
-        if(fileName === 'gym.geojson') category = "体育施設";
-        else if(fileName === 'mus.geojson') category = "文化・図書館";
-        else if(fileName === 'cul.geojson') category = "文化財";
-        else category = "公共施設";
+// --- 5. データの流し込み（完全指定通りの色・アイコン） ---
+
+// 🔵🟢🔴 基本探索 (Ver1.0継続)
+loadPointData('data/rel.geojson', layers.rel, icons.blue);
+loadPointData('data/park.geojson', layers.park, icons.blue);
+loadPointData('data/com.geojson', layers.com, icons.green);
+loadPointData('data/mus.geojson', layers.mus, icons.green);
+loadPointData('data/gym.geojson', layers.gym, icons.green);
+loadPointData('data/cul.geojson', layers.cul, icons.green);
+loadPointData('data/wc.geojson', layers.wc); // 赤丸
+
+// 🔲 面・ポリゴン (新設データ)
+loadGeometryData('data/A35b_景観地区_近畿.geojson', layers.keikan, {color: '#1E90FF', weight: 2, fillOpacity: 0.3}); // 🟦 青
+loadGeometryData('data/A35c_景観重要建造物樹木_近畿.geojson', layers.tree, {color: '#32CD32', weight: 2, fillOpacity: 0.3}); // 🟩 緑
+loadGeometryData('data/A42_歴史的風土保存区域_近畿.geojson', layers.fudo, {color: '#8B4513', weight: 2, fillOpacity: 0.3}); // 🟫 茶
+loadGeometryData('data/A43_伝統的建造物群保存地区_近畿.geojson', layers.denken, {color: '#800080', weight: 2, fillOpacity: 0.3}); // 🟪 紫
+loadGeometryData('data/A44_歴史的風致重点地区_近畿.geojson', layers.fuchi, {color: '#FFD700', weight: 2, fillOpacity: 0.3}); // 🟨 黄
+loadGeometryData('data/P12_観光資源_近畿.geojson', layers.kanko, {color: '#FF8C00', weight: 2, fillOpacity: 0.3}); // 🟧 オレンジ
+
+// 📍 新設ピンデータ
+loadPointData('data/restaurants_0_0_8.geojson', layers.restaurants, icons.orange, "※10m程度の誤差あり"); // 🍽️ オレンジピン
+loadPointData('data/OSM_trail_ancient-road.geojson', layers.trail, icons.purple); // 🐾 紫ピン
+
+// 〰️ 線・ルートデータ
+loadGeometryData('data/TokaiNatureTrail_Route.geojson', layers.shizenhodo, {color: '#2E8B57', weight: 4}); // 緑の線
+loadGeometryData('data/gokaido_routes.geojson', layers.gokaido, {color: '#B22222', weight: 4}); // 赤の線
+
+// --- 6. メニューの構築（仕切り線＆独立表示） ---
+const baseMaps = {};
+const overlayMaps = {
+    // CSSを流し込んで擬似的な見出しを作るプロの技！
+    "<span style='font-size:1.05em; font-weight:bold; color:#1565C0;'>【基本探索】</span><br>♟️ 探索地点 (道標/史跡等)": layers.rel,
+    "🌳 公園・遊具": layers.park,
+    "🏟️ 公共施設": layers.com,
+    "📚 文化施設": layers.mus,
+    "🏃‍♂️ 体育施設": layers.gym,
+    "🏯 文化財": layers.cul,
+    "🚾 トイレ (赤丸)": layers.wc,
+
+    "<hr style='margin:6px 0;'><span style='font-size:1.05em; font-weight:bold; color:#E65100;'>【探索候補・広域地域データ】</span><br>🏞️ 景観地区 (青枠)": layers.keikan,
+    "🌲 景観重要建造物樹木 (緑枠)": layers.tree,
+    "📜 歴史的風土保存区域 (茶枠)": layers.fudo,
+    "🏘️ 伝統的建造物群保存地区 (紫枠)": layers.denken,
+    "🗺️ 歴史的風致重点地区 (黄枠)": layers.fuchi,
+    "🎆 観光資源 (オレンジ枠)": layers.kanko,
+    "🍽️ 飲食店データ (オレンジピン)": layers.restaurants,
+
+    "<hr style='margin:6px 0;'><span style='font-size:1.05em; font-weight:bold; color:#2E7D32;'>【上級者向け・長距離踏破】</span><br>🐾 トレイル.古道 (紫ピン)": layers.trail,
+    "🛤️ 東海自然歩道 (緑線)": layers.shizenhodo,
+    "🛣️ 五街道 (赤線)": layers.gokaido
+};
+
+// 基本探索ピンのみ、初期状態からマップ上にONにしておく
+layers.rel.addTo(map);
+layers.park.addTo(map);
+layers.com.addTo(map);
+layers.mus.addTo(map);
+layers.gym.addTo(map);
+layers.cul.addTo(map);
+
+const layerControl = L.control.layers(baseMaps, overlayMaps, {collapsed: true}).addTo(map);
+
+// --- 7. 安全装置（警告ポップアップ） ---
+let advanceWarningShown = false;
+
+map.on('overlayadd', function(e) {
+    // 文字列の一部が含まれているかで判定（HTMLタグを無視するため）
+    if (e.name.includes('飲食店データ')) {
+        alert("このデータはジオコーディング変換による10m前後の誤差、および閉店の可能性があります。訪問の際はご注意ください。");
     }
-
-    marker.bindPopup(`
-        <div style="text-align:center;">
-            <strong style="font-size:1.1rem;">${name}</strong><br>
-            <span style="font-size:0.8rem; color:#666;">[${category}]</span>
-        </div>
-    `);
-    return marker;
-}
-
-// 8. 📱 UIイベント
-function initUiEvents() {
-    document.getElementById('sidebar-toggle').addEventListener('click', () => 
-        document.getElementById('sidebar').classList.toggle('open')
-    );
-    
-    document.getElementById('locate-btn').addEventListener('click', () => { 
-        if (userLocationMarker) map.setView(userLocationMarker.getLatLng(), map.getZoom()); 
-    });
-    
-    document.getElementById('scan-btn').addEventListener('click', scanSurrounding);
-    map.on('zoomend', updateScanButtonState);
-    updateScanButtonState();
-
-    // トイレモード切替
-    document.getElementById('toilet-mode-toggle').addEventListener('change', (e) => {
-        isToiletMode = e.target.checked;
-        const scanBtn = document.getElementById('scan-btn');
-        const reportBtn = document.getElementById('report-wc-btn');
-        const toggleText = document.querySelector('.toggle-text');
-        
-        activeMarkersGroup.clearLayers();
-        
-        if (isToiletMode) {
-            toggleText.innerText = "ON";
-            scanBtn.style.backgroundColor = "#F44336";
-            reportBtn.classList.remove('hidden');
-        } else {
-            toggleText.innerText = "OFF";
-            scanBtn.style.backgroundColor = "#2196F3";
-            reportBtn.classList.add('hidden');
+    if (e.name.includes('トレイル.古道') || e.name.includes('東海自然歩道') || e.name.includes('五街道')) {
+        if (!advanceWarningShown) {
+            alert("【上級者向け警告】\n難易度の高い登山ルートや長距離トレイルが含まれます。事前に計画を立て、予定を周囲に伝えてから出発しましょう。");
+            advanceWarningShown = true;
         }
-        updateScanButtonState();
-    });
+    }
+});
 
-    // 通報ボタン
-    document.getElementById('report-wc-btn').addEventListener('click', () => {
-         if (!userLocationMarker) return;
-         const p = userLocationMarker.getLatLng();
-         window.location.href = `mailto:info@resosynq.com?subject=トイレに関する連絡&body=緯度:${p.lat} 経度:${p.lng}`;
-    });
+// --- 8. UI制御（ローディング・メニュー・ライセンス） ---
+// 3秒間ローディング画面を維持
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const screen = document.getElementById('loading-screen');
+        if (screen) {
+            screen.style.opacity = '0';
+            setTimeout(() => screen.style.display = 'none', 800);
+        }
+    }, 3000);
+});
 
-    // ライセンス
-    document.getElementById('license-btn').addEventListener('click', () => 
-        document.getElementById('license-overlay').classList.remove('hidden')
-    );
-    document.getElementById('license-close-btn').addEventListener('click', () => 
-        document.getElementById('license-overlay').classList.add('hidden')
-    );
+// 三本線ボタンでレイヤーコントロールを強制的に開閉
+const menuBtn = document.getElementById('menu-btn');
+if (menuBtn) {
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const controlContainer = document.querySelector('.leaflet-control-layers');
+        if (controlContainer.classList.contains('leaflet-control-layers-expanded')) {
+            layerControl.collapse();
+        } else {
+            layerControl.expand();
+        }
+    });
 }
+
+// ライセンスモーダル制御
+const modal = document.getElementById('license-modal');
+const closeBtn = document.querySelector('.close-btn');
+if(closeBtn) closeBtn.onclick = () => modal.style.display = "none";
+window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; }
+
+// ライセンスボタン追加
+const LicenseControl = L.Control.extend({
+    options: { position: 'bottomright' },
+    onAdd: function() {
+        const btn = L.DomUtil.create('button', 'license-info-btn');
+        btn.innerHTML = "📜 規約・出典";
+        btn.style.padding = "5px";
+        btn.style.cursor = "pointer";
+        btn.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+        btn.style.border = "2px solid rgba(0,0,0,0.2)";
+        btn.style.borderRadius = "4px";
+        btn.onclick = () => modal.style.display = "block";
+        return btn;
+    }
+});
+map.addControl(new LicenseControl());

@@ -18,7 +18,7 @@ body, html, #map {
 }
 #location-btn { 
     top: 15px; right: 15px; 
-    z-index: 9990; /* 第3階層：メニューより下 */
+    z-index: 900; /* 🚨 第3階層：メニューより下（修正！） */
 }
 
 /* 🚪 スライドメニュー */
@@ -29,12 +29,12 @@ body, html, #map {
     box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important; background: rgba(255, 255, 255, 0.95) !important;
     transition: left 0.3s ease-in-out !important;
     
-    z-index: 9999 !important; /* 🚨 第2階層：メニューボタン(10000)より下、その他の全ボタン(9990)より上！ */
+    z-index: 1000 !important; /* 🚨 第2階層：Leaflet標準の天井(1000)に合わせる */
     
     /* ✨ スクロール復活の魔法 ✨ */
     height: 100vh !important; 
     padding: 75px 20px 40px 20px !important; 
-    box-sizing: border-box !important; /* 余白を高さに含める */
+    box-sizing: border-box !important; 
     overflow-y: auto !important;
 }
 body.menu-open .leaflet-control-layers { left: 0 !important; }
@@ -42,7 +42,7 @@ body.menu-open .leaflet-control-layers { left: 0 !important; }
 /* 📡 スキャンボタン (画面下部) */
 #scan-btn {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    z-index: 9990; /* 🚨 第3階層：メニュー(9999)より下！ */
+    z-index: 900; /* 🚨 第3階層：メニューより下！（修正！） */
     padding: 12px 24px; border: none; border-radius: 30px;
     font-size: 15px; font-weight: bold; color: white;
     box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: all 0.3s ease; white-space: nowrap;
@@ -50,16 +50,16 @@ body.menu-open .leaflet-control-layers { left: 0 !important; }
 #scan-btn:not(.disabled) { background-color: #007BFF; cursor: pointer; }
 #scan-btn.disabled { background-color: #888888; cursor: not-allowed; opacity: 0.8; }
 
-/* 📜 右下のフローティングボタン（アイコンのみの四角ボタン化） */
+/* 📜 右下のフローティングボタン（アイコンのみ） */
 .floating-btn {
     position: fixed; right: 15px; 
-    z-index: 9990; /* 🚨 第3階層：メニューより下！ */
+    z-index: 900; /* 🚨 第3階層：メニューより下！（修正！） */
     background: white; border: 2px solid rgba(0,0,0,0.2); border-radius: 8px;
     width: 45px; height: 45px; font-weight: bold; cursor: pointer; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 22px; 
     display: flex; justify-content: center; align-items: center;
 }
-#help-btn { bottom: 75px; } /* 少し上に配置 */
+#help-btn { bottom: 75px; } 
 #license-btn { bottom: 20px; }
 
 /* チェックボックス水平揃え */

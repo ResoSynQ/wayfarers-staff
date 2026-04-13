@@ -1,10 +1,12 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.3
- * メインロジック（スライドメニュー＆見出し独立・完全水平揃え版）
+ * 旅人の杖と救いの泉 Ver 2.0.4
+ * メインロジック（右下ボタン復活＆奥行き完全制御版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
+// Leafletの右下のクレジット（Attribution）とボタンが被らないように、クレジットを左下に移動！
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+map.attributionControl.setPosition('bottomleft');
 
 const icons = {
     blue: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
@@ -47,10 +49,7 @@ async function fetchAllData() {
 }
 fetchAllData();
 
-// --- 🚨 メニューの項目名を極限までシンプルに！ ---
-// （見出しは後からプログラムで自動挿入するため、ここは項目名だけにする）
-const dummyHelp = L.layerGroup();
-const dummyLicense = L.layerGroup();
+// --- 🚨 メニュー項目から「ヘルプ」と「ライセンス」を完全削除！ ---
 const baseMaps = {};
 const overlayMaps = {
     "♟️ 探索地点": layers.rel,
@@ -69,9 +68,7 @@ const overlayMaps = {
     "🍽️ 飲食店データ": layers.restaurants,
     "🐾 トレイル.古道": layers.trail,
     "🛤️ 東海自然歩道": layers.shizenhodo, 
-    "🛣️ 五街道": layers.gokaido,
-    "❓ ヘルプ": dummyHelp,
-    "🗺️ ライセンス": dummyLicense
+    "🛣️ 五街道": layers.gokaido
 };
 
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
@@ -79,41 +76,25 @@ layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
 
 const layerControl = L.control.layers(baseMaps, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
-// --- ✨【究極の魔法】カテゴリ見出しを「完全に独立した段落」として挿入する ✨ ---
+// 見出し挿入関数（【その他】を削除）
 function insertCategoryHeaders() {
-    // 古い見出しが残っていれば一度消す
     document.querySelectorAll('.custom-layer-header').forEach(el => el.remove());
-
     const labels = document.querySelectorAll('.leaflet-control-layers-overlays label');
     labels.forEach(label => {
         const text = label.textContent.trim();
         let headerHtml = "";
-        
-        // 指定の項目の「直前」に、独立したHTMLブロックとして見出しを追加！
         if (text.includes("探索地点")) {
             headerHtml = "<div class='custom-layer-header' style='font-size:1.05em; font-weight:bold; color:#1565C0; margin-top:5px; margin-bottom:10px;'>【基本探索】</div>";
         } else if (text.includes("景観地区")) {
             headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#E65100;'>【広域地域データ】</div></div>";
         } else if (text.includes("トレイル.古道")) {
             headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#2E7D32;'>【上級者向け】</div></div>";
-        } else if (text.includes("ヘルプ")) {
-            headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#444;'>【その他】</div></div>";
         }
-        
-        if (headerHtml) {
-            label.insertAdjacentHTML('beforebegin', headerHtml);
-        }
+        if (headerHtml) label.insertAdjacentHTML('beforebegin', headerHtml);
     });
 }
-
-// 起動時に見出しを挿入
 insertCategoryHeaders();
-
-// チェックボックスを押してLeafletがメニューを再描画した時にも、瞬時に見出しを復活させる！
-map.on('layeradd layerremove', () => {
-    setTimeout(insertCategoryHeaders, 10);
-});
-// --------------------------------------------------------------------------
+map.on('layeradd layerremove', () => setTimeout(insertCategoryHeaders, 10));
 
 // --- スキャン機能 ---
 const SCAN_ZOOM = 15;
@@ -176,14 +157,20 @@ map.on('overlayadd', function(e) {
     if (e.name.includes('トレイル') || e.name.includes('東海自然歩道') || e.name.includes('五街道')) {
         if (!advanceWarningShown) { alert("【上級者向け警告】\n難易度の高いルートが含まれます。事前に計画を立てましょう。"); advanceWarningShown = true; }
     }
-    if (e.layer === dummyHelp) { map.removeLayer(dummyHelp); document.getElementById('help-modal').style.display = "block"; }
-    if (e.layer === dummyLicense) { map.removeLayer(dummyLicense); window.location.href = "license.html"; }
 });
 
 // ☰ボタンのスライド挙動
 document.getElementById('menu-btn').addEventListener('click', (e) => {
     e.stopPropagation();
     document.body.classList.toggle('menu-open');
+});
+
+// 🚨 右下ボタンの挙動を追加！
+document.getElementById('help-btn').addEventListener('click', () => {
+    document.getElementById('help-modal').style.display = "block";
+});
+document.getElementById('license-btn').addEventListener('click', () => {
+    window.location.href = "license.html";
 });
 
 window.addEventListener('load', () => { setTimeout(() => { const s = document.getElementById('loading-screen'); if(s){ s.style.opacity = '0'; setTimeout(()=> s.style.display='none', 800); } }, 3000); });

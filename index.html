@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>旅人の杖と救いの泉 Ver 2.0</title>
+    <title>旅人の杖と救いの泉</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <button id="menu-btn" title="メニュー">☰</button>
+    
+    <button id="scan-btn" title="周辺をスキャン">🧭 現在地</button>
+    
+    <button id="help-btn" title="ヘルプ">❓ ヘルプ</button>
 
     <div id="loading-screen">
         <img src="Loading_Image.webp" id="loading-logo" alt="旅人の杖 ロゴ">
@@ -25,15 +29,14 @@
 
     <div id="map"></div>
 
-    <div id="license-modal" class="modal">
+    <div id="help-modal" class="modal">
         <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <div id="license-body">
-                <h2>利用規約・ライセンス・出典表示</h2>
-                <p>制定日：2026年3月26日</p>
-                <hr>
-                <p>（利用規約の詳細はapp.jsにて動的に生成、またはここに記述します）</p>
-            </div>
+            <span class="close-btn" id="close-help">&times;</span>
+            <h2>旅人の杖 使い方</h2>
+            <p>1. <b>左上の「☰」ボタン</b>から、見つけたいオアシスや史跡のレイヤーをONにしてください。</p>
+            <p>2. <b>右上の「🧭 現在地」ボタン</b>を押すと、あなたの現在地にワープします。</p>
+            <p>3. <b>アイコンをタップ</b>すると、その場所の名前が表示されます。</p>
+            <p>※上級者ルートや飲食店を利用する際は、周囲の安全や最新の営業状況にご注意ください。</p>
         </div>
     </div>
 

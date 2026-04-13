@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
     <title>旅人の杖と救いの泉</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <link rel="stylesheet" href="style.css?v=2.0.2" />
+    <link rel="stylesheet" href="style.css?v=2.0.4" />
 </head>
 <body>
     <button id="menu-btn" title="メニュー">☰</button>
@@ -19,6 +16,10 @@
     <button id="location-btn" title="現在地へ移動">🧭</button>
     
     <button id="scan-btn" class="disabled" disabled>もっと近づいてスキャン</button>
+
+    <button id="help-btn" class="floating-btn" title="ヘルプ">❓ ヘルプ</button>
+    
+    <button id="license-btn" class="floating-btn" title="ライセンス">📜 規約・出典</button>
 
     <div id="loading-screen">
         <img src="image_3.webp" id="loading-logo" alt="旅人の杖 ロゴ">
@@ -47,7 +48,6 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <script src="app.js?v=2.0.2"></script>
+    <script src="app.js?v=2.0.4"></script>
 </body>
 </html>

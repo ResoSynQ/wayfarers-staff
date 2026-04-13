@@ -2,87 +2,59 @@
 body, html, #map {
     margin: 0; padding: 0; height: 100%; width: 100%;
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    overflow-x: hidden; /* 横スクロールを防止 */
+    overflow-x: hidden;
 }
 
-/* 📱 画面上の固定ボタン群（四角いアイコンボタンに統一） */
+/* 📱 画面上の固定ボタン群（左上・右上） */
 #menu-btn, #location-btn {
     position: fixed;
-    z-index: 10000; /* メニューパネルより上に配置して常に押せるように！ */
-    background: white;
-    border: 2px solid rgba(0,0,0,0.2);
-    border-radius: 8px;
-    width: 45px;
-    height: 45px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
+    z-index: 10000; /* メニューパネルより上！常に押せる */
+    background: white; border: 2px solid rgba(0,0,0,0.2); border-radius: 8px;
+    width: 45px; height: 45px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; font-size: 24px;
 }
-
 #menu-btn { top: 15px; left: 15px; }
 #location-btn { top: 15px; right: 15px; }
 
 /* 📡 スキャンボタン (画面下部) */
 #scan-btn {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    z-index: 9999; padding: 12px 24px; border: none; border-radius: 30px;
+    z-index: 9990; /* 🚨 メニュー(9998)より下に設定！ */
+    padding: 12px 24px; border: none; border-radius: 30px;
     font-size: 15px; font-weight: bold; color: white;
     box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: all 0.3s ease; white-space: nowrap;
 }
 #scan-btn:not(.disabled) { background-color: #007BFF; cursor: pointer; }
 #scan-btn.disabled { background-color: #888888; cursor: not-allowed; opacity: 0.8; }
 
-/* 🚪 スライドメニュー（Leaflet標準機能を完全カスタマイズ） */
+/* 📜 右下のフローティングボタン（ヘルプ・ライセンス） */
+.floating-btn {
+    position: fixed; right: 15px; z-index: 9990; /* 🚨 これもメニューより下！ */
+    background: rgba(255, 255, 255, 0.9); border: 2px solid rgba(0,0,0,0.2); border-radius: 8px;
+    padding: 6px 12px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 13px; color: #333;
+}
+#help-btn { bottom: 65px; }
+#license-btn { bottom: 25px; }
+
+/* 🚪 スライドメニュー */
 .leaflet-control-layers {
-    position: fixed !important;
-    top: 0 !important;
-    left: -320px !important; /* 初期状態は画面の左外に隠す */
-    width: 280px !important;
-    height: 100vh !important; /* 画面いっぱいの高さ */
-    margin: 0 !important;
-    padding: 70px 20px 20px 20px !important; /* 上のボタンと被らないように余白 */
-    border-radius: 0 !important;
-    border: none !important;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    transition: left 0.3s ease-in-out !important; /* スーッと出るアニメーション */
-    z-index: 9998 !important; /* ボタンより下、マップより上 */
-    overflow-y: auto !important; /* メニューが長い場合はスクロール可能に */
+    position: fixed !important; top: 0 !important; left: -320px !important; 
+    width: 280px !important; height: 100vh !important; margin: 0 !important;
+    padding: 70px 20px 20px 20px !important; border-radius: 0 !important; border: none !important;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important; background: rgba(255, 255, 255, 0.95) !important;
+    transition: left 0.3s ease-in-out !important;
+    z-index: 9998 !important; /* 🚨 ボタン群より上で、最前面のメニューボタンよりは下！ */
+    overflow-y: auto !important;
 }
+body.menu-open .leaflet-control-layers { left: 0 !important; }
 
-/* ✨ bodyに 'menu-open' クラスが付いた時に左からスライドイン！ ✨ */
-body.menu-open .leaflet-control-layers {
-    left: 0 !important;
-}
-
-/* 🚨 チェックボックスとアイコンの「完璧な水平揃え」魔法 */
-.leaflet-control-layers-overlays label { 
-    display: flex !important; 
-    align-items: center !important; /* 垂直方向の中央揃え */
-    margin-bottom: 8px !important; 
-    font-size: 15px;
-    cursor: pointer;
-}
-.leaflet-control-layers-overlays input[type="checkbox"] { 
-    margin: 0 12px 0 0 !important; /* アイコンとの間に隙間を作る */
-    flex-shrink: 0 !important; 
-    width: 16px; 
-    height: 16px;
-    cursor: pointer;
-}
-.leaflet-control-layers-overlays span { 
-    display: flex !important; 
-    align-items: center !important; 
-}
-
-/* 不要な標準ボタンを消す */
+/* チェックボックス水平揃え */
+.leaflet-control-layers-overlays label { display: flex !important; align-items: center !important; margin-bottom: 8px !important; font-size: 15px; cursor: pointer; }
+.leaflet-control-layers-overlays input[type="checkbox"] { margin: 0 12px 0 0 !important; flex-shrink: 0 !important; width: 16px; height: 16px; cursor: pointer; }
+.leaflet-control-layers-overlays span { display: flex !important; align-items: center !important; }
 .leaflet-control-layers-toggle { display: none !important; }
 
-/* ⏳ ローディング・モーダル設定 */
+/* その他UI */
 #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100000; transition: opacity 0.8s ease; }
 #loading-logo { max-width: 250px; margin-bottom: 30px; }
 .warning-text { color: #444; font-size: 0.9rem; line-height: 1.6; text-align: center; padding: 0 25px; margin-bottom: 20px; }

@@ -5,7 +5,7 @@ body, html, #map {
 }
 
 /* 📱 画面上の固定ボタン群 */
-#menu-btn, #scan-btn, #help-btn {
+#menu-btn, #location-btn {
     position: fixed;
     z-index: 9999;
     background: white;
@@ -21,22 +21,54 @@ body, html, #map {
     align-items: center;
 }
 
-/* 各ボタンの配置位置 */
 #menu-btn { top: 15px; left: 15px; width: 45px; font-size: 20px; }
-#scan-btn { top: 15px; right: 15px; font-size: 14px; }
-#help-btn { top: 65px; right: 15px; font-size: 14px; }
+#location-btn { top: 15px; right: 15px; font-size: 14px; }
 
-/* 🚨 メニュー内のチェックボックスとアイコンを「必ず横並び」にする魔法 */
-.leaflet-control-layers-overlays label > div {
+/* 📡 スキャンボタン (画面下部) */
+#scan-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+#scan-btn:not(.disabled) {
+    background-color: #007BFF;
+    cursor: pointer;
+}
+#scan-btn.disabled {
+    background-color: #888888;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* 🚨 メニュー内のチェックボックスとアイコンを「必ず横並び」にする */
+.leaflet-control-layers-overlays label {
     display: flex !important;
     align-items: center !important;
     margin-bottom: 5px;
-    white-space: nowrap; /* テキストの変な改行を防ぐ */
 }
 .leaflet-control-layers-overlays input[type="checkbox"] {
-    margin: 0 8px 0 0 !important; /* チェックボックスの右に余白 */
-    flex-shrink: 0; /* チェックボックスが潰れないようにする */
+    margin: 0 8px 0 0 !important;
+    flex-shrink: 0;
 }
+.leaflet-control-layers-overlays span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* メニューパネルの位置調整 */
+.leaflet-control-layers { margin-top: 70px !important; margin-left: 15px !important; }
+.leaflet-left .leaflet-control { margin-left: 0; }
 
 /* ⏳ ローディング画面 */
 #loading-screen {
@@ -60,7 +92,3 @@ body, html, #map {
     border-radius: 12px; line-height: 1.6;
 }
 .close-btn { float: right; font-size: 24px; font-weight: bold; cursor: pointer; }
-
-/* メニューパネル自体の位置調整 */
-.leaflet-control-layers { margin-top: 70px !important; margin-left: 15px !important; }
-.leaflet-left .leaflet-control { margin-left: 0; }

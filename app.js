@@ -1,10 +1,9 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.4
- * メインロジック（右下ボタン復活＆奥行き完全制御版）
+ * 旅人の杖と救いの泉 Ver 2.0.10
+ * メインロジック（道標変更 ＆ 独立ヘルプページ版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
-// Leafletの右下のクレジット（Attribution）とボタンが被らないように、クレジットを左下に移動！
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
 map.attributionControl.setPosition('bottomleft');
 
@@ -49,10 +48,9 @@ async function fetchAllData() {
 }
 fetchAllData();
 
-// --- 🚨 メニュー項目から「ヘルプ」と「ライセンス」を完全削除！ ---
 const baseMaps = {};
 const overlayMaps = {
-    "♟️ 探索地点": layers.rel,
+    "♟️ 道標": layers.rel, // 🚨 ここを「道標」に変更！
     "🌳 公園・遊具": layers.park, 
     "🏟️ 公共施設": layers.com, 
     "📚 文化施設": layers.mus, 
@@ -76,14 +74,15 @@ layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
 
 const layerControl = L.control.layers(baseMaps, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
-// 見出し挿入関数（【その他】を削除）
 function insertCategoryHeaders() {
     document.querySelectorAll('.custom-layer-header').forEach(el => el.remove());
     const labels = document.querySelectorAll('.leaflet-control-layers-overlays label');
     labels.forEach(label => {
         const text = label.textContent.trim();
         let headerHtml = "";
-        if (text.includes("探索地点")) {
+        
+        // 🚨 ここも「道標」に反応して見出しをつけるように変更！
+        if (text.includes("道標")) {
             headerHtml = "<div class='custom-layer-header' style='font-size:1.05em; font-weight:bold; color:#1565C0; margin-top:5px; margin-bottom:10px;'>【基本探索】</div>";
         } else if (text.includes("景観地区")) {
             headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#E65100;'>【広域地域データ】</div></div>";
@@ -159,24 +158,20 @@ map.on('overlayadd', function(e) {
     }
 });
 
-// ☰ボタンのスライド挙動
 document.getElementById('menu-btn').addEventListener('click', (e) => {
     e.stopPropagation();
     document.body.classList.toggle('menu-open');
 });
 
-// 🚨 右下ボタンの挙動を追加！
+// 🚨 ❓ボタンを押したら、総指揮官が作った help.html にジャンプ！
 document.getElementById('help-btn').addEventListener('click', () => {
-    document.getElementById('help-modal').style.display = "block";
+    window.location.href = "help.html";
 });
 document.getElementById('license-btn').addEventListener('click', () => {
     window.location.href = "license.html";
 });
 
 window.addEventListener('load', () => { setTimeout(() => { const s = document.getElementById('loading-screen'); if(s){ s.style.opacity = '0'; setTimeout(()=> s.style.display='none', 800); } }, 3000); });
-const helpModal = document.getElementById('help-modal');
-document.getElementById('close-help').onclick = () => helpModal.style.display = "none";
-window.onclick = (e) => { if (e.target == helpModal) helpModal.style.display = "none"; };
 
 // 🧭 現在地取得
 document.getElementById('location-btn').addEventListener('click', () => { map.locate({setView: true, maxZoom: 16}); });

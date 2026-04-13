@@ -10,12 +10,12 @@
 <body>
     <button id="menu-btn" title="メニュー">☰</button>
     
-    <button id="scan-btn" title="周辺をスキャン">🧭 現在地</button>
+    <button id="location-btn" title="現在地へ移動">🧭 現在地</button>
     
-    <button id="help-btn" title="ヘルプ">❓ ヘルプ</button>
+    <button id="scan-btn" class="disabled" disabled>もっと近づいてスキャン</button>
 
     <div id="loading-screen">
-        <img src="Loading_Image.webp" id="loading-logo" alt="旅人の杖 ロゴ">
+        <img src="image_3.webp" id="loading-logo" alt="旅人の杖 ロゴ">
         <p class="warning-text">
             このアプリは探索の補助を目的としたツールです。<br>
             収録されているデータはスポットの適性や正確性を保証するものではありません。<br>
@@ -33,8 +33,8 @@
         <div class="modal-content">
             <span class="close-btn" id="close-help">&times;</span>
             <h2>旅人の杖 使い方</h2>
-            <p>1. <b>左上の「☰」ボタン</b>から、見つけたいオアシスや史跡のレイヤーをONにしてください。</p>
-            <p>2. <b>右上の「🧭 現在地」ボタン</b>を押すと、あなたの現在地にワープします。</p>
+            <p>1. <b>左上の「☰」ボタン</b>から、見つけたい情報のレイヤーをONにしてください。</p>
+            <p>2. マップをズームし、<b>画面下の「周囲をスキャン」ボタン</b>を押すと、その範囲のデータが出現します。</p>
             <p>3. <b>アイコンをタップ</b>すると、その場所の名前が表示されます。</p>
             <p>※上級者ルートや飲食店を利用する際は、周囲の安全や最新の営業状況にご注意ください。</p>
         </div>

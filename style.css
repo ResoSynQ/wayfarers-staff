@@ -2,12 +2,13 @@
 body, html, #map {
     margin: 0; padding: 0; height: 100%; width: 100%;
     font-family: 'Helvetica Neue', Arial, sans-serif;
+    overflow-x: hidden; /* 横スクロールを防止 */
 }
 
 /* 📱 画面上の固定ボタン群（四角いアイコンボタンに統一） */
 #menu-btn, #location-btn {
     position: fixed;
-    z-index: 9999;
+    z-index: 10000; /* メニューパネルより上に配置して常に押せるように！ */
     background: white;
     border: 2px solid rgba(0,0,0,0.2);
     border-radius: 8px;
@@ -35,31 +36,51 @@ body, html, #map {
 #scan-btn:not(.disabled) { background-color: #007BFF; cursor: pointer; }
 #scan-btn.disabled { background-color: #888888; cursor: not-allowed; opacity: 0.8; }
 
-/* 🚨 Leaflet標準のレイヤーアイコン（重なった紙）を完全に消し去る魔法 */
-.leaflet-control-layers-toggle {
-    display: none !important;
-}
-/* 閉じた状態のときの不要な枠線と背景を透明に */
+/* 🚪 スライドメニュー（Leaflet標準機能を完全カスタマイズ） */
 .leaflet-control-layers {
+    position: fixed !important;
+    top: 0 !important;
+    left: -320px !important; /* 初期状態は画面の左外に隠す */
+    width: 280px !important;
+    height: 100vh !important; /* 画面いっぱいの高さ */
+    margin: 0 !important;
+    padding: 70px 20px 20px 20px !important; /* 上のボタンと被らないように余白 */
+    border-radius: 0 !important;
     border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    margin-top: 65px !important;
-    margin-left: 15px !important;
-}
-/* 開いた状態のときは白背景と枠線を復活させる */
-.leaflet-control-layers-expanded {
-    background: white !important;
-    border: 2px solid rgba(0,0,0,0.2) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
-    padding: 10px !important;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    transition: left 0.3s ease-in-out !important; /* スーッと出るアニメーション */
+    z-index: 9998 !important; /* ボタンより下、マップより上 */
+    overflow-y: auto !important; /* メニューが長い場合はスクロール可能に */
 }
 
-/* メニュー内のチェックボックス強制横並び */
-.leaflet-control-layers-overlays label { display: flex !important; align-items: center !important; margin-bottom: 5px; }
-.leaflet-control-layers-overlays input[type="checkbox"] { margin: 0 8px 0 0 !important; flex-shrink: 0; }
-.leaflet-control-layers-overlays span { display: inline-block; vertical-align: middle; }
+/* ✨ bodyに 'menu-open' クラスが付いた時に左からスライドイン！ ✨ */
+body.menu-open .leaflet-control-layers {
+    left: 0 !important;
+}
+
+/* 🚨 チェックボックスとアイコンの「完璧な水平揃え」魔法 */
+.leaflet-control-layers-overlays label { 
+    display: flex !important; 
+    align-items: center !important; /* 垂直方向の中央揃え */
+    margin-bottom: 8px !important; 
+    font-size: 15px;
+    cursor: pointer;
+}
+.leaflet-control-layers-overlays input[type="checkbox"] { 
+    margin: 0 12px 0 0 !important; /* アイコンとの間に隙間を作る */
+    flex-shrink: 0 !important; 
+    width: 16px; 
+    height: 16px;
+    cursor: pointer;
+}
+.leaflet-control-layers-overlays span { 
+    display: flex !important; 
+    align-items: center !important; 
+}
+
+/* 不要な標準ボタンを消す */
+.leaflet-control-layers-toggle { display: none !important; }
 
 /* ⏳ ローディング・モーダル設定 */
 #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100000; transition: opacity 0.8s ease; }

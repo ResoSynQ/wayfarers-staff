@@ -14,11 +14,11 @@ body, html, #map {
 }
 #menu-btn { 
     top: 15px; left: 15px; 
-    z-index: 10000; /* 第1階層：最前面（常に押せる） */
+    z-index: 10000;
 }
 #location-btn { 
     top: 15px; right: 15px; 
-    z-index: 900; /* 第3階層：メニューより下 */
+    z-index: 900;
 }
 
 /* 🚪 スライドメニュー */
@@ -28,10 +28,7 @@ body, html, #map {
     border-radius: 0 !important; border: none !important;
     box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important; background: rgba(255, 255, 255, 0.95) !important;
     transition: left 0.3s ease-in-out !important;
-    
-    z-index: 1000 !important; /* 第2階層：Leaflet標準の天井(1000)に合わせる */
-    
-    /* スクロール設定 */
+    z-index: 1000 !important;
     height: 100vh !important; 
     padding: 75px 20px 40px 20px !important; 
     box-sizing: border-box !important; 
@@ -42,7 +39,7 @@ body.menu-open .leaflet-control-layers { left: 0 !important; }
 /* 📡 スキャンボタン (画面下部) */
 #scan-btn {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    z-index: 900; /* 第3階層：メニューより下 */
+    z-index: 900;
     padding: 12px 24px; border: none; border-radius: 30px;
     font-size: 15px; font-weight: bold; color: white;
     box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: all 0.3s ease; white-space: nowrap;
@@ -50,10 +47,10 @@ body.menu-open .leaflet-control-layers { left: 0 !important; }
 #scan-btn:not(.disabled) { background-color: #007BFF; cursor: pointer; }
 #scan-btn.disabled { background-color: #888888; cursor: not-allowed; opacity: 0.8; }
 
-/* 📜 右下のフローティングボタン（アイコンのみ） */
+/* 📜 右下のフローティングボタン */
 .floating-btn {
     position: fixed; right: 15px; 
-    z-index: 900; /* 第3階層：メニューより下 */
+    z-index: 900;
     background: white; border: 2px solid rgba(0,0,0,0.2); border-radius: 8px;
     width: 45px; height: 45px; font-weight: bold; cursor: pointer; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 22px; 
@@ -68,23 +65,8 @@ body.menu-open .leaflet-control-layers { left: 0 !important; }
 .leaflet-control-layers-overlays span { display: flex !important; align-items: center !important; }
 .leaflet-control-layers-toggle { display: none !important; }
 
-/* ⏳ その他UI・ローディング設定 */
+/* ⏳ ローディング設定 */
 #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100000; transition: opacity 0.8s ease; }
-
-/* 画像の高さをスマホ画面に最適化 */
-#loading-logo { 
-    max-width: 80%; 
-    max-height: 35vh; 
-    object-fit: contain; 
-    margin-bottom: 20px; 
-    border: none !important; 
-    outline: none;
-}
-
-/* 🚨 オリジナルテキストに合わせてフォントサイズを0.8remに縮小！横の余白(padding)も詰めて広くしたぜ！ */
+#loading-logo { max-width: 80%; max-height: 35vh; object-fit: contain; margin-bottom: 20px; border: none !important; outline: none; }
 .warning-text { color: #444; font-size: 0.8rem; line-height: 1.6; text-align: center; padding: 0 10px; margin-bottom: 20px; }
-
-.modal { display: none; position: fixed; z-index: 10001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
-.modal-content { background-color: white; margin: 15% auto; padding: 20px; width: 80%; max-height: 70vh; overflow-y: auto; border-radius: 12px; line-height: 1.6; }
-.close-btn { float: right; font-size: 24px; font-weight: bold; cursor: pointer; }
 .leaflet-left .leaflet-control { margin-left: 0; }

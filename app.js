@@ -1,6 +1,6 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.2
- * メインロジック（スライドメニュー完全実装版）
+ * 旅人の杖と救いの泉 Ver 2.0.3
+ * メインロジック（スライドメニュー＆見出し独立・完全水平揃え版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
@@ -47,28 +47,73 @@ async function fetchAllData() {
 }
 fetchAllData();
 
-// --- メニュー構築 ---
+// --- 🚨 メニューの項目名を極限までシンプルに！ ---
+// （見出しは後からプログラムで自動挿入するため、ここは項目名だけにする）
 const dummyHelp = L.layerGroup();
 const dummyLicense = L.layerGroup();
 const baseMaps = {};
 const overlayMaps = {
-    "<span style='font-size:1.05em; font-weight:bold; color:#1565C0;'>【基本探索】</span><br>♟️ 探索地点": layers.rel,
-    "🌳 公園・遊具": layers.park, "🏟️ 公共施設": layers.com, "📚 文化施設": layers.mus, "🏃‍♂️ 体育施設": layers.gym,
-    "🏯 文化財": layers.cul, "🚾 トイレ (赤丸)": layers.wc,
-    "<hr style='margin:6px 0;'><span style='font-size:1.05em; font-weight:bold; color:#E65100;'>【広域地域データ】</span><br>🏞️ 景観地区": layers.keikan,
-    "🌲 景観重要建造物樹木": layers.tree, "📜 歴史的風土保存区域": layers.fudo, "🏘️ 伝統的建造物群保存地区": layers.denken,
-    "🗺️ 歴史的風致重点地区": layers.fuchi, "🎆 観光資源": layers.kanko, "🍽️ 飲食店データ": layers.restaurants,
-    "<hr style='margin:6px 0;'><span style='font-size:1.05em; font-weight:bold; color:#2E7D32;'>【上級者向け】</span><br>🐾 トレイル.古道": layers.trail,
-    "🛤️ 東海自然歩道": layers.shizenhodo, "🛣️ 五街道": layers.gokaido,
-    "<hr style='margin:6px 0;'><span style='font-size:1.05em; font-weight:bold; color:#444;'>【その他】</span><br>❓ ヘルプ": dummyHelp,
+    "♟️ 探索地点": layers.rel,
+    "🌳 公園・遊具": layers.park, 
+    "🏟️ 公共施設": layers.com, 
+    "📚 文化施設": layers.mus, 
+    "🏃‍♂️ 体育施設": layers.gym,
+    "🏯 文化財": layers.cul, 
+    "🚾 トイレ (赤丸)": layers.wc,
+    "🏞️ 景観地区": layers.keikan,
+    "🌲 景観重要建造物樹木": layers.tree, 
+    "📜 歴史的風土保存区域": layers.fudo, 
+    "🏘️ 伝統的建造物群保存地区": layers.denken,
+    "🗺️ 歴史的風致重点地区": layers.fuchi, 
+    "🎆 観光資源": layers.kanko, 
+    "🍽️ 飲食店データ": layers.restaurants,
+    "🐾 トレイル.古道": layers.trail,
+    "🛤️ 東海自然歩道": layers.shizenhodo, 
+    "🛣️ 五街道": layers.gokaido,
+    "❓ ヘルプ": dummyHelp,
     "🗺️ ライセンス": dummyLicense
 };
 
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
 layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
 
-// 🚨【魔法】collapsed: false にして、最初から裏で開いた状態にしておく！
 const layerControl = L.control.layers(baseMaps, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
+
+// --- ✨【究極の魔法】カテゴリ見出しを「完全に独立した段落」として挿入する ✨ ---
+function insertCategoryHeaders() {
+    // 古い見出しが残っていれば一度消す
+    document.querySelectorAll('.custom-layer-header').forEach(el => el.remove());
+
+    const labels = document.querySelectorAll('.leaflet-control-layers-overlays label');
+    labels.forEach(label => {
+        const text = label.textContent.trim();
+        let headerHtml = "";
+        
+        // 指定の項目の「直前」に、独立したHTMLブロックとして見出しを追加！
+        if (text.includes("探索地点")) {
+            headerHtml = "<div class='custom-layer-header' style='font-size:1.05em; font-weight:bold; color:#1565C0; margin-top:5px; margin-bottom:10px;'>【基本探索】</div>";
+        } else if (text.includes("景観地区")) {
+            headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#E65100;'>【広域地域データ】</div></div>";
+        } else if (text.includes("トレイル.古道")) {
+            headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#2E7D32;'>【上級者向け】</div></div>";
+        } else if (text.includes("ヘルプ")) {
+            headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#444;'>【その他】</div></div>";
+        }
+        
+        if (headerHtml) {
+            label.insertAdjacentHTML('beforebegin', headerHtml);
+        }
+    });
+}
+
+// 起動時に見出しを挿入
+insertCategoryHeaders();
+
+// チェックボックスを押してLeafletがメニューを再描画した時にも、瞬時に見出しを復活させる！
+map.on('layeradd layerremove', () => {
+    setTimeout(insertCategoryHeaders, 10);
+});
+// --------------------------------------------------------------------------
 
 // --- スキャン機能 ---
 const SCAN_ZOOM = 15;
@@ -135,7 +180,7 @@ map.on('overlayadd', function(e) {
     if (e.layer === dummyLicense) { map.removeLayer(dummyLicense); window.location.href = "license.html"; }
 });
 
-// 🚨【魔法】☰ボタンを押した時、CSSのクラスを付け外ししてスライドインさせる！
+// ☰ボタンのスライド挙動
 document.getElementById('menu-btn').addEventListener('click', (e) => {
     e.stopPropagation();
     document.body.classList.toggle('menu-open');

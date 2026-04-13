@@ -1,6 +1,6 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.1
- * メインロジック（パス修正・完全動作版）
+ * 旅人の杖と救いの泉 Ver 2.0.2
+ * メインロジック（スライドメニュー完全実装版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
@@ -13,7 +13,6 @@ const icons = {
     orange: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] })
 };
 
-// 🚨 【重要】「data/」を外し、GitHubのファイル名に完全に一致させた！
 const layerDefs = {
     rel: { url: 'rel.geojson', icon: icons.blue },
     park: { url: 'park.geojson', icon: icons.blue },
@@ -29,7 +28,7 @@ const layerDefs = {
     fuchi: { url: 'A44_歴史的風致重点地区_近畿.geojson', style: {color: '#FFD700', weight: 2, fillOpacity: 0.3} },
     kanko: { url: 'P12_観光資源_近畿.geojson', style: {color: '#FF8C00', weight: 2, fillOpacity: 0.3} },
     restaurants: { url: 'restaurants_0_0_8.geojson', icon: icons.orange, popup: "※10m程度の誤差あり" },
-    trail: { url: 'OSM_relics_of_kinki_38142.geojson', icon: icons.purple }, // ←ファイル名修正
+    trail: { url: 'OSM_relics_of_kinki_38142.geojson', icon: icons.purple },
     shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: {color: '#2E8B57', weight: 4} },
     gokaido: { url: 'gokaido_routes.geojson', style: {color: '#B22222', weight: 4} }
 };
@@ -38,14 +37,11 @@ const rawData = {};
 const layers = {};
 Object.keys(layerDefs).forEach(key => { layers[key] = L.layerGroup(); });
 
-// データのバックグラウンド読み込み
 async function fetchAllData() {
     for (const [key, def] of Object.entries(layerDefs)) {
         try {
             const res = await fetch(def.url);
-            if(res.ok) {
-                rawData[key] = await res.json();
-            }
+            if(res.ok) rawData[key] = await res.json();
         } catch (e) { console.error(`Failed to load ${key}:`, e); }
     }
 }
@@ -68,10 +64,11 @@ const overlayMaps = {
     "🗺️ ライセンス": dummyLicense
 };
 
-// 初期表示ON（データはスキャンするまで出ない）
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
 layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
-const layerControl = L.control.layers(baseMaps, overlayMaps, {collapsed: true, position: 'topleft'}).addTo(map);
+
+// 🚨【魔法】collapsed: false にして、最初から裏で開いた状態にしておく！
+const layerControl = L.control.layers(baseMaps, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
 // --- スキャン機能 ---
 const SCAN_ZOOM = 15;
@@ -100,7 +97,7 @@ scanBtn.addEventListener('click', () => {
     setTimeout(() => {
         Object.keys(layerDefs).forEach(key => {
             if (map.hasLayer(layers[key]) && rawData[key]) {
-                layers[key].clearLayers(); // 古いピンを消去
+                layers[key].clearLayers();
                 const def = layerDefs[key];
                 L.geoJSON(rawData[key], {
                     filter: function(feature) {
@@ -138,8 +135,13 @@ map.on('overlayadd', function(e) {
     if (e.layer === dummyLicense) { map.removeLayer(dummyLicense); window.location.href = "license.html"; }
 });
 
+// 🚨【魔法】☰ボタンを押した時、CSSのクラスを付け外ししてスライドインさせる！
+document.getElementById('menu-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.body.classList.toggle('menu-open');
+});
+
 window.addEventListener('load', () => { setTimeout(() => { const s = document.getElementById('loading-screen'); if(s){ s.style.opacity = '0'; setTimeout(()=> s.style.display='none', 800); } }, 3000); });
-document.getElementById('menu-btn').addEventListener('click', (e) => { e.stopPropagation(); const c = document.querySelector('.leaflet-control-layers'); c.classList.contains('leaflet-control-layers-expanded') ? layerControl.collapse() : layerControl.expand(); });
 const helpModal = document.getElementById('help-modal');
 document.getElementById('close-help').onclick = () => helpModal.style.display = "none";
 window.onclick = (e) => { if (e.target == helpModal) helpModal.style.display = "none"; };

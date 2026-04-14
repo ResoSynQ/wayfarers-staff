@@ -1,6 +1,6 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.14
- * メインロジック（東海自然歩道・強制ネーミング対応版）
+ * 旅人の杖と救いの泉 Ver 2.0.13
+ * メインロジック（ポップアップ属性名・完全対応版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
@@ -30,8 +30,7 @@ const layerDefs = {
     kanko: { url: 'P12_観光資源_近畿.geojson', style: {color: '#FF8C00', weight: 2, fillOpacity: 0.3} },
     restaurants: { url: 'restaurant.geojson', icon: icons.orange },
     trail: { url: 'OSM_trail.geojson', icon: icons.purple },
-    // 🚨 【魔法】データの中身を無視して名前を強制上書きする「forceName」を設定！
-    shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: {color: '#2E8B57', weight: 4}, forceName: "東海自然歩道" },
+    shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: {color: '#2E8B57', weight: 4}, defaultName: "東海自然歩道" },
     gokaido: { url: 'gokaido_routes.geojson', style: {color: '#B22222', weight: 4} }
 };
 
@@ -59,20 +58,15 @@ function renderGeoJson(key, bounds = null) {
         style: def.style,
         onEachFeature: function(feature, layer) {
             const p = feature.properties;
-            let name = "";
+            // 🚨 【魔法】あらゆるデータ形式に対応するため、名前になりそうな属性を順番に探す！
+            let name = p.name || p.名称 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || def.defaultName || "名称未定";
             
-            // 🚨 forceName が設定されている場合は、データの中身を問答無用で無視してそれを採用！
-            if (def.forceName) {
-                name = def.forceName;
-            } else {
-                name = p.name || p.名称 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || "名称未定";
-                
-                if (name === "名称未定") {
-                    for (let propKey in p) {
-                        if (propKey.includes("名") && !propKey.includes("都道府県") && !propKey.includes("市区町村")) {
-                            name = p[propKey];
-                            break;
-                        }
+            // 最後の保険：それでも名称未定で、プロパティの中に「名」がつくキーがあればそれを採用する
+            if (name === "名称未定") {
+                for (let propKey in p) {
+                    if (propKey.includes("名") && !propKey.includes("都道府県") && !propKey.includes("市区町村")) {
+                        name = p[propKey];
+                        break;
                     }
                 }
             }

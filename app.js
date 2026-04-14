@@ -1,24 +1,23 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.25
- * メインロジック（MapTiler完全連携版）
+ * 旅人の杖と救いの泉 Ver 2.1.0
+ * 総指揮官専用・MapTilerカスタムマップ完全統合版
  */
 
+// 1. マップの初期化
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
-// 🚨 ここが錬成した総指揮官の専用マップだ！
-const customMap = L.tileLayer('https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/style.json?key=GloGcr9XQvZ6g4JrFj0x', {
+// 2. 総指揮官専用のカスタムマップ（真のID: 019d8b1d... を使用）
+// 🚨 key= の後ろの【】部分を、ご自身の新しいAPIキーに書き換えてください。
+const customMap = L.tileLayer('https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/256/{z}/{x}/{y}.png?key=GloGcr9XQvZ6g4JrFj0x', {
     maxZoom: 19,
     attribution: '© <a href="https://www.maptiler.com/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 
-// 切り替え用に他のマップも用意
-const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' });
-const gsiPale = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© 国土地理院' });
-
-// 初期表示をカスタムマップに設定！
+// カスタムマップを画面に表示
 customMap.addTo(map);
 map.attributionControl.setPosition('bottomleft');
 
+// 3. アイコンの設定
 const icons = {
     blue: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
     green: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
@@ -26,32 +25,25 @@ const icons = {
     orange: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] })
 };
 
+// 4. 名称取得の補助関数
 function getFeatureName(p) {
     if (!p) return "名称未定";
     let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || "名称未定";
     if (String(name) === "0" || name === "" || name === null) name = "名称未定";
-    if (name === "名称未定") {
-        for (let propKey in p) {
-            if (propKey.includes("名") && !propKey.includes("都道府県") && !propKey.includes("市区町村")) {
-                name = p[propKey];
-                break;
-            }
-        }
-    }
     return name;
 }
 
+// 5. ルート（線）のスタイル設定
 function getRouteStyle(feature) {
     const name = getFeatureName(feature.properties);
     if (name.includes("東海自然歩道本線以外")) return { color: "#0052cc", weight: 4, opacity: 0.8 }; 
     if (name.includes("東海自然歩道")) return { color: "#27ae60", weight: 6, opacity: 0.9 }; 
     const palettes = { "東海道": "#0052cc", "中山道": "#d91e18", "甲州街道": "#f39c12", "奥州街道": "#8e44ad", "日光街道": "#16a085" };
     for (let key in palettes) { if (name.includes(key)) return { color: palettes[key], weight: 5, opacity: 0.8 }; }
-    const fallbackColors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9'];
-    let hash = 0; for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    return { color: fallbackColors[Math.abs(hash) % fallbackColors.length], weight: 4, opacity: 0.8 };
+    return { color: "#FF1493", weight: 4, opacity: 0.8 };
 }
 
+// 6. レイヤーの定義
 const layerDefs = {
     rel: { url: 'rel.geojson', icon: icons.blue }, park: { url: 'park.geojson', icon: icons.blue },
     com: { url: 'com.geojson', icon: icons.green }, mus: { url: 'mus.geojson', icon: icons.green },
@@ -67,10 +59,12 @@ const layerDefs = {
     shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: getRouteStyle }, gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
 };
 
+// 即時読み込みするレイヤー
 const immediateLayers = ['keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
 const rawData = {}; const layers = {};
 Object.keys(layerDefs).forEach(key => { layers[key] = L.layerGroup(); });
 
+// 7. GeoJSONのレンダリング
 function renderGeoJson(key, bounds = null) {
     layers[key].clearLayers();
     const def = layerDefs[key];
@@ -88,6 +82,7 @@ function renderGeoJson(key, bounds = null) {
     }).addTo(layers[key]);
 }
 
+// 8. データのフェッチ
 async function fetchAllData() {
     for (const [key, def] of Object.entries(layerDefs)) {
         try {
@@ -98,24 +93,21 @@ async function fetchAllData() {
 }
 fetchAllData();
 
-// 🚨 背景地図の切り替えメニュー
-const baseMaps = {
-    "🗺️ 俺のカスタムマップ": customMap,
-    "🗾 国土地理院 (淡色)": gsiPale,
-    "🌍 標準マップ (OSM)": osm
-};
-
+// 9. レイヤーコントロールの設定（背景切り替えなし、オーバーレイのみ）
 const overlayMaps = {
     "♟️ 道標": layers.rel, "🌳 公園・遊具": layers.park, "🏟️ 公共施設": layers.com, "📚 文化施設": layers.mus, "🏃‍♂️ 体育施設": layers.gym, "🏯 文化財": layers.cul, "🚾 トイレ (赤丸)": layers.wc,
     "🏞️ 景観地区": layers.keikan, "🌲 景観重要建造物樹木": layers.tree, "📜 歴史的風土保存区域": layers.fudo, "🏘️ 伝統的建造物群保存地区": layers.denken, "🗺️ 歴史的風致重点地区": layers.fuchi, "🎆 観光資源": layers.kanko, 
     "🍽️ 喫茶店・レストラン": layers.restaurants, "🐾 トレイル.古道": layers.trail, "🛤️ 東海自然歩道": layers.shizenhodo, "🛣️ 五街道": layers.gokaido
 };
 
+// 初期表示するオーバーレイ
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
 layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
 
-L.control.layers(baseMaps, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
+// コントロールを追加（第一引数を null にすることで背景切り替えを非表示にする）
+L.control.layers(null, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
+// 10. 見出しの挿入ロジック
 function insertCategoryHeaders() {
     document.querySelectorAll('.custom-layer-header').forEach(el => el.remove());
     document.querySelectorAll('.leaflet-control-layers-overlays label').forEach(label => {
@@ -126,12 +118,11 @@ function insertCategoryHeaders() {
         else if (text.includes("喫茶店")) headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#2E7D32;'>【上級者向け】</div></div>";
         if (headerHtml) label.insertAdjacentHTML('beforebegin', headerHtml);
     });
-    const separator = document.querySelector('.leaflet-control-layers-separator');
-    if (separator) separator.style.display = 'block';
 }
 insertCategoryHeaders();
 map.on('layeradd layerremove', () => setTimeout(insertCategoryHeaders, 10));
 
+// 11. スキャンボタンの設定
 const SCAN_ZOOM = 15;
 const scanBtn = document.getElementById('scan-btn');
 function updateScanBtn() {
@@ -152,17 +143,13 @@ scanBtn?.addEventListener('click', () => {
     }, 600);
 });
 
-let restaurantWarningShown = false, advanceWarningShown = false;
-map.on('overlayadd', function(e) {
-    if (e.name.includes('喫茶店') && !restaurantWarningShown) { alert("飲食店データは最大で10mの誤差があることがあります。立ち寄る際は十分に確認してください。"); restaurantWarningShown = true; }
-    if ((e.name.includes('トレイル') || e.name.includes('自然歩道') || e.name.includes('五街道')) && !advanceWarningShown) { alert("【上級者向け警告】\n難易度の高いルートが含まれます。事前に計画を立てましょう。"); advanceWarningShown = true; }
-});
-
+// 12. UIボタン類
 document.getElementById('menu-btn')?.addEventListener('click', (e) => { e.stopPropagation(); document.body.classList.toggle('menu-open'); });
 document.getElementById('help-btn')?.addEventListener('click', () => { window.location.href = "help.html"; });
 document.getElementById('license-btn')?.addEventListener('click', () => { window.location.href = "license.html"; });
 document.getElementById('location-btn')?.addEventListener('click', () => { map.locate({setView: true, maxZoom: 16}); });
 
+// 13. ローディング画面の制御
 function hideLoadingScreen() {
     const s = document.getElementById('loading-screen');
     if(s && s.style.display !== 'none') { s.style.opacity = '0'; setTimeout(() => s.style.display = 'none', 800); }
@@ -170,5 +157,5 @@ function hideLoadingScreen() {
 window.addEventListener('load', () => setTimeout(hideLoadingScreen, 1500));
 setTimeout(hideLoadingScreen, 4000);
 
+// 14. 位置情報の取得
 map.on('locationfound', (e) => { L.circleMarker(e.latlng, {radius: 8, fillColor: '#007BFF', color: '#fff', weight: 2, fillOpacity: 1}).addTo(map).bindPopup("現在地").openPopup(); });
-map.on('locationerror', () => { alert("現在地を取得できませんでした。端末の位置情報設定を確認してください。"); });

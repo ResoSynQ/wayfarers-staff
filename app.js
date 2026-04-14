@@ -1,6 +1,6 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.19
- * メインロジック（フリーズ絶対回避 ＆ A列name参照版）
+ * 旅人の杖と救いの泉 Ver 2.0.20
+ * メインロジック（五街道・東海自然歩道 ルート別固定色対応版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
@@ -13,6 +13,51 @@ const icons = {
     purple: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] }),
     orange: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] })
 };
+
+// 🚨 【新魔法】どんなデータ形式からでも正確に名前を見つけ出す共通関数
+function getFeatureName(p) {
+    if (!p) return "名称未定";
+    let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || "名称未定";
+    
+    if (String(name) === "0" || name === "" || name === null) name = "名称未定";
+
+    if (name === "名称未定") {
+        for (let propKey in p) {
+            if (propKey.includes("名") && !propKey.includes("都道府県") && !propKey.includes("市区町村")) {
+                name = p[propKey];
+                break;
+            }
+        }
+    }
+    return name;
+}
+
+// 🚨 【新魔法】ルートの名前から「絶対に変わらない固定の色」を割り出す関数
+function getRouteStyle(feature) {
+    const name = getFeatureName(feature.properties);
+    
+    // 主要ルートにはあらかじめ美しい専用カラーを用意！
+    const palettes = {
+        "東海道": "#0052cc",     // 青
+        "中山道": "#d91e18",     // 赤
+        "甲州街道": "#f39c12",   // オレンジ
+        "奥州街道": "#8e44ad",   // 紫
+        "日光街道": "#16a085",   // ターコイズ（青緑）
+        "東海自然歩道": "#27ae60" // 緑
+    };
+
+    for (let key in palettes) {
+        if (name.includes(key)) return { color: palettes[key], weight: 5, opacity: 0.8 };
+    }
+
+    // 上記以外の細かいルートの場合は、名前の文字から計算（ハッシュ化）して色を自動決定！
+    const fallbackColors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9'];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    let color = fallbackColors[Math.abs(hash) % fallbackColors.length];
+    
+    return { color: color, weight: 4, opacity: 0.8 };
+}
 
 const layerDefs = {
     rel: { url: 'rel.geojson', icon: icons.blue },
@@ -30,9 +75,9 @@ const layerDefs = {
     kanko: { url: 'P12_観光資源_近畿.geojson', style: {color: '#FF8C00', weight: 2, fillOpacity: 0.3} },
     restaurants: { url: 'restaurant.geojson', icon: icons.orange },
     trail: { url: 'OSM_trail.geojson', icon: icons.purple },
-    // 🚨 強制上書きを解除！データ（A列のname）を素直に参照する形に戻したぜ！
-    shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: {color: '#2E8B57', weight: 4} },
-    gokaido: { url: 'gokaido_routes.geojson', style: {color: '#B22222', weight: 4} }
+    // 🚨 東海自然歩道と五街道のスタイルに、さっき作った「色分け関数」を適用！
+    shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: getRouteStyle },
+    gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
 };
 
 const immediateLayers = ['keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
@@ -58,23 +103,8 @@ function renderGeoJson(key, bounds = null) {
         },
         style: def.style,
         onEachFeature: function(feature, layer) {
-            // 🚨 空データによるフリーズを絶対防止するための安全装置
-            const p = feature.properties || {}; 
-            
-            let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || "名称未定";
-            
-            // "0" のような数字データも確実に弾く処理
-            if (String(name) === "0" || name === "" || name === null) name = "名称未定";
-
-            if (name === "名称未定") {
-                for (let propKey in p) {
-                    if (propKey.includes("名") && !propKey.includes("都道府県") && !propKey.includes("市区町村")) {
-                        name = p[propKey];
-                        break;
-                    }
-                }
-            }
-
+            // 先ほど作った共通関数でスッキリと名前を取得！
+            const name = getFeatureName(feature.properties);
             let popupContent = `<strong>${name}</strong>`;
             layer.bindPopup(popupContent);
         }
@@ -195,7 +225,6 @@ map.on('overlayadd', function(e) {
     }
 });
 
-// 🚨 要素が見つからなくてもエラーで落ちないようにする魔法「?.」を追加！
 document.getElementById('menu-btn')?.addEventListener('click', (e) => {
     e.stopPropagation();
     document.body.classList.toggle('menu-open');
@@ -205,7 +234,6 @@ document.getElementById('help-btn')?.addEventListener('click', () => { window.lo
 document.getElementById('license-btn')?.addEventListener('click', () => { window.location.href = "license.html"; });
 document.getElementById('location-btn')?.addEventListener('click', () => { map.locate({setView: true, maxZoom: 16}); });
 
-// ⏳ ローディング画面の確実な解除魔法
 function hideLoadingScreen() {
     const s = document.getElementById('loading-screen');
     if(s && s.style.display !== 'none') {
@@ -214,7 +242,6 @@ function hideLoadingScreen() {
     }
 }
 window.addEventListener('load', () => setTimeout(hideLoadingScreen, 1500));
-// 🚨 万が一データ読み込みが詰まっても、絶対に4秒後にはローディングを解除して画面を開く！
 setTimeout(hideLoadingScreen, 4000);
 
 map.on('locationfound', (e) => { L.circleMarker(e.latlng, {radius: 8, fillColor: '#007BFF', color: '#fff', weight: 2, fillOpacity: 1}).addTo(map).bindPopup("現在地").openPopup(); });

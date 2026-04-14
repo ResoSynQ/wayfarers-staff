@@ -1,6 +1,6 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.20
- * メインロジック（五街道・東海自然歩道 ルート別固定色対応版）
+ * 旅人の杖と救いの泉 Ver 2.0.21
+ * メインロジック（東海自然歩道 色分け完璧版 ＆ データ修正対応）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
@@ -14,7 +14,6 @@ const icons = {
     orange: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] })
 };
 
-// 🚨 【新魔法】どんなデータ形式からでも正確に名前を見つけ出す共通関数
 function getFeatureName(p) {
     if (!p) return "名称未定";
     let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || "名称未定";
@@ -32,25 +31,26 @@ function getFeatureName(p) {
     return name;
 }
 
-// 🚨 【新魔法】ルートの名前から「絶対に変わらない固定の色」を割り出す関数
 function getRouteStyle(feature) {
     const name = getFeatureName(feature.properties);
     
-    // 主要ルートにはあらかじめ美しい専用カラーを用意！
+    // 🚨 順番が命！「本線以外」という文字が入っていたら優先して青にする！
+    if (name.includes("東海自然歩道本線以外")) return { color: "#0052cc", weight: 4, opacity: 0.8 }; // 青
+    // 🚨 その上で、「東海自然歩道」なら緑にする！
+    if (name.includes("東海自然歩道")) return { color: "#27ae60", weight: 5, opacity: 0.9 }; // 緑
+
     const palettes = {
         "東海道": "#0052cc",     // 青
         "中山道": "#d91e18",     // 赤
         "甲州街道": "#f39c12",   // オレンジ
         "奥州街道": "#8e44ad",   // 紫
-        "日光街道": "#16a085",   // ターコイズ（青緑）
-        "東海自然歩道": "#27ae60" // 緑
+        "日光街道": "#16a085"    // ターコイズ
     };
 
     for (let key in palettes) {
         if (name.includes(key)) return { color: palettes[key], weight: 5, opacity: 0.8 };
     }
 
-    // 上記以外の細かいルートの場合は、名前の文字から計算（ハッシュ化）して色を自動決定！
     const fallbackColors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9'];
     let hash = 0;
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -75,7 +75,6 @@ const layerDefs = {
     kanko: { url: 'P12_観光資源_近畿.geojson', style: {color: '#FF8C00', weight: 2, fillOpacity: 0.3} },
     restaurants: { url: 'restaurant.geojson', icon: icons.orange },
     trail: { url: 'OSM_trail.geojson', icon: icons.purple },
-    // 🚨 東海自然歩道と五街道のスタイルに、さっき作った「色分け関数」を適用！
     shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: getRouteStyle },
     gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
 };
@@ -103,7 +102,6 @@ function renderGeoJson(key, bounds = null) {
         },
         style: def.style,
         onEachFeature: function(feature, layer) {
-            // 先ほど作った共通関数でスッキリと名前を取得！
             const name = getFeatureName(feature.properties);
             let popupContent = `<strong>${name}</strong>`;
             layer.bindPopup(popupContent);
@@ -205,7 +203,6 @@ scanBtn?.addEventListener('click', () => {
     }, 600);
 });
 
-// --- UI / アラート ---
 let advanceWarningShown = false;
 let restaurantWarningShown = false;
 

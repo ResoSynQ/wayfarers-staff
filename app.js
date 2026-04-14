@@ -1,6 +1,6 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.12
- * メインロジック（アラート最適化 ＆ 東海自然歩道ポップアップ対応版）
+ * 旅人の杖と救いの泉 Ver 2.0.13
+ * メインロジック（ポップアップ属性名・完全対応版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
@@ -28,9 +28,8 @@ const layerDefs = {
     denken: { url: 'A43_伝統的建造物群保存地区_近畿.geojson', style: {color: '#800080', weight: 2, fillOpacity: 0.3} },
     fuchi: { url: 'A44_歴史的風致重点地区_近畿.geojson', style: {color: '#FFD700', weight: 2, fillOpacity: 0.3} },
     kanko: { url: 'P12_観光資源_近畿.geojson', style: {color: '#FF8C00', weight: 2, fillOpacity: 0.3} },
-    restaurants: { url: 'restaurant.geojson', icon: icons.orange }, // 🚨 個別の警告ポップアップを撤去！
+    restaurants: { url: 'restaurant.geojson', icon: icons.orange },
     trail: { url: 'OSM_trail.geojson', icon: icons.purple },
-    // 🚨 東海自然歩道にデフォルトネームを設定！
     shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: {color: '#2E8B57', weight: 4}, defaultName: "東海自然歩道" },
     gokaido: { url: 'gokaido_routes.geojson', style: {color: '#B22222', weight: 4} }
 };
@@ -58,10 +57,22 @@ function renderGeoJson(key, bounds = null) {
         },
         style: def.style,
         onEachFeature: function(feature, layer) {
-            // 🚨 データ側に名前がなくても、defaultNameがあればそれを表示する魔法！
-            let name = feature.properties.name || feature.properties.名称 || def.defaultName || "名称未定";
+            const p = feature.properties;
+            // 🚨 【魔法】あらゆるデータ形式に対応するため、名前になりそうな属性を順番に探す！
+            let name = p.name || p.名称 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || def.defaultName || "名称未定";
+            
+            // 最後の保険：それでも名称未定で、プロパティの中に「名」がつくキーがあればそれを採用する
+            if (name === "名称未定") {
+                for (let propKey in p) {
+                    if (propKey.includes("名") && !propKey.includes("都道府県") && !propKey.includes("市区町村")) {
+                        name = p[propKey];
+                        break;
+                    }
+                }
+            }
+
             let popupContent = `<strong>${name}</strong>`;
-            if (def.popup) popupContent += `<br>${def.popup}`; // popupオプションがあれば改行して追加
+            if (def.popup) popupContent += `<br>${def.popup}`;
             layer.bindPopup(popupContent);
         }
     }).addTo(layers[key]);
@@ -162,10 +173,9 @@ scanBtn.addEventListener('click', () => {
 
 // --- UI / アラート ---
 let advanceWarningShown = false;
-let restaurantWarningShown = false; // 🚨 飲食店用フラグを追加
+let restaurantWarningShown = false;
 
 map.on('overlayadd', function(e) {
-    // 🚨 飲食店をONにした時、初回のみアラートを出す！
     if (e.name.includes('飲食店データ')) {
         if (!restaurantWarningShown) {
             alert("飲食店データは最大で10mの誤差があることがあります。立ち寄る際は十分に確認してください。");

@@ -1,10 +1,22 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.22
- * メインロジック（東海自然歩道・本線緑/支線青 完璧塗り分け版）
+ * 旅人の杖と救いの泉 Ver 2.0.25
+ * メインロジック（MapTiler完全連携版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+
+// 🚨 ここが錬成した総指揮官の専用マップだ！
+const customMap = L.tileLayer('https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/256/{z}/{x}/{y}.png?key=gw6gL4y47w5r3N8s5rPQ', {
+    maxZoom: 19,
+    attribution: '© <a href="https://www.maptiler.com/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
+
+// 切り替え用に他のマップも用意
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' });
+const gsiPale = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© 国土地理院' });
+
+// 初期表示をカスタムマップに設定！
+customMap.addTo(map);
 map.attributionControl.setPosition('bottomleft');
 
 const icons = {
@@ -14,7 +26,6 @@ const icons = {
     orange: new L.Icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] })
 };
 
-// 名前取得の共通安全関数
 function getFeatureName(p) {
     if (!p) return "名称未定";
     let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || "名称未定";
@@ -30,45 +41,21 @@ function getFeatureName(p) {
     return name;
 }
 
-// 🚨 ルート別の固定色設定（東海自然歩道の塗り分けを最優先！）
 function getRouteStyle(feature) {
     const name = getFeatureName(feature.properties);
-    
-    // 1. 東海自然歩道の判定（本線以外を先に判定するのがコツだぜ！）
-    if (name.includes("東海自然歩道本線以外")) {
-        return { color: "#0052cc", weight: 4, opacity: 0.8 }; // 🔵 支線は「青」
-    }
-    if (name.includes("東海自然歩道")) {
-        return { color: "#27ae60", weight: 6, opacity: 0.9 }; // 🟢 本線は「太い緑」
-    }
-
-    // 2. 五街道の判定
-    const palettes = {
-        "東海道": "#0052cc",     // 青
-        "中山道": "#d91e18",     // 赤
-        "甲州街道": "#f39c12",   // オレンジ
-        "奥州街道": "#8e44ad",   // 紫
-        "日光街道": "#16a085"    // ターコイズ
-    };
-    for (let key in palettes) {
-        if (name.includes(key)) return { color: palettes[key], weight: 5, opacity: 0.8 };
-    }
-
-    // 3. その他（自動生成色）
+    if (name.includes("東海自然歩道本線以外")) return { color: "#0052cc", weight: 4, opacity: 0.8 }; 
+    if (name.includes("東海自然歩道")) return { color: "#27ae60", weight: 6, opacity: 0.9 }; 
+    const palettes = { "東海道": "#0052cc", "中山道": "#d91e18", "甲州街道": "#f39c12", "奥州街道": "#8e44ad", "日光街道": "#16a085" };
+    for (let key in palettes) { if (name.includes(key)) return { color: palettes[key], weight: 5, opacity: 0.8 }; }
     const fallbackColors = ['#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9'];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    let color = fallbackColors[Math.abs(hash) % fallbackColors.length];
-    return { color: color, weight: 4, opacity: 0.8 };
+    let hash = 0; for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    return { color: fallbackColors[Math.abs(hash) % fallbackColors.length], weight: 4, opacity: 0.8 };
 }
 
 const layerDefs = {
-    rel: { url: 'rel.geojson', icon: icons.blue },
-    park: { url: 'park.geojson', icon: icons.blue },
-    com: { url: 'com.geojson', icon: icons.green },
-    mus: { url: 'mus.geojson', icon: icons.green },
-    gym: { url: 'gym.geojson', icon: icons.green },
-    cul: { url: 'cul.geojson', icon: icons.green },
+    rel: { url: 'rel.geojson', icon: icons.blue }, park: { url: 'park.geojson', icon: icons.blue },
+    com: { url: 'com.geojson', icon: icons.green }, mus: { url: 'mus.geojson', icon: icons.green },
+    gym: { url: 'gym.geojson', icon: icons.green }, cul: { url: 'cul.geojson', icon: icons.green },
     wc: { url: 'wc.geojson', isCircle: true },
     keikan: { url: 'A35b_景観地区_近畿.geojson', style: {color: '#1E90FF', weight: 2, fillOpacity: 0.3} },
     tree: { url: 'A35c_景観重要建造物樹木_近畿.geojson', style: {color: '#32CD32', weight: 2, fillOpacity: 0.3} },
@@ -76,16 +63,12 @@ const layerDefs = {
     denken: { url: 'A43_伝統的建造物群保存地区_近畿.geojson', style: {color: '#800080', weight: 2, fillOpacity: 0.3} },
     fuchi: { url: 'A44_歴史的風致重点地区_近畿.geojson', style: {color: '#FFD700', weight: 2, fillOpacity: 0.3} },
     kanko: { url: 'P12_観光資源_近畿.geojson', style: {color: '#FF8C00', weight: 2, fillOpacity: 0.3} },
-    restaurants: { url: 'restaurant.geojson', icon: icons.orange },
-    trail: { url: 'OSM_trail.geojson', icon: icons.purple },
-    shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: getRouteStyle },
-    gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
+    restaurants: { url: 'restaurant.geojson', icon: icons.orange }, trail: { url: 'OSM_trail.geojson', icon: icons.purple },
+    shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: getRouteStyle }, gokaido: { url: 'gokaido_routes.geojson', style: getRouteStyle }
 };
 
 const immediateLayers = ['keikan', 'tree', 'fudo', 'denken', 'fuchi', 'kanko', 'trail', 'shizenhodo', 'gokaido'];
-
-const rawData = {};
-const layers = {};
+const rawData = {}; const layers = {};
 Object.keys(layerDefs).forEach(key => { layers[key] = L.layerGroup(); });
 
 function renderGeoJson(key, bounds = null) {
@@ -93,10 +76,7 @@ function renderGeoJson(key, bounds = null) {
     const def = layerDefs[key];
     L.geoJSON(rawData[key], {
         filter: function(feature) {
-            if (bounds && feature.geometry && feature.geometry.type === "Point") {
-                const latlng = L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
-                return bounds.contains(latlng);
-            }
+            if (bounds && feature.geometry && feature.geometry.type === "Point") { return bounds.contains(L.latLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0])); }
             return true;
         },
         pointToLayer: function(feature, latlng) {
@@ -104,10 +84,7 @@ function renderGeoJson(key, bounds = null) {
             return L.marker(latlng, { icon: def.icon || new L.Icon.Default() });
         },
         style: def.style,
-        onEachFeature: function(feature, layer) {
-            const name = getFeatureName(feature.properties);
-            layer.bindPopup(`<strong>${name}</strong>`);
-        }
+        onEachFeature: function(feature, layer) { layer.bindPopup(`<strong>${getFeatureName(feature.properties)}</strong>`); }
     }).addTo(layers[key]);
 }
 
@@ -115,14 +92,18 @@ async function fetchAllData() {
     for (const [key, def] of Object.entries(layerDefs)) {
         try {
             const res = await fetch(def.url);
-            if(res.ok) {
-                rawData[key] = await res.json();
-                if (immediateLayers.includes(key)) renderGeoJson(key);
-            }
+            if(res.ok) { rawData[key] = await res.json(); if (immediateLayers.includes(key)) renderGeoJson(key); }
         } catch (e) { console.error(`Failed to load ${key}:`, e); }
     }
 }
 fetchAllData();
+
+// 🚨 背景地図の切り替えメニュー
+const baseMaps = {
+    "🗺️ 俺のカスタムマップ": customMap,
+    "🗾 国土地理院 (淡色)": gsiPale,
+    "🌍 標準マップ (OSM)": osm
+};
 
 const overlayMaps = {
     "♟️ 道標": layers.rel, "🌳 公園・遊具": layers.park, "🏟️ 公共施設": layers.com, "📚 文化施設": layers.mus, "🏃‍♂️ 体育施設": layers.gym, "🏯 文化財": layers.cul, "🚾 トイレ (赤丸)": layers.wc,
@@ -133,7 +114,7 @@ const overlayMaps = {
 layers.rel.addTo(map); layers.park.addTo(map); layers.com.addTo(map);
 layers.mus.addTo(map); layers.gym.addTo(map); layers.cul.addTo(map);
 
-L.control.layers({}, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
+L.control.layers(baseMaps, overlayMaps, {collapsed: false, position: 'topleft'}).addTo(map);
 
 function insertCategoryHeaders() {
     document.querySelectorAll('.custom-layer-header').forEach(el => el.remove());
@@ -145,6 +126,8 @@ function insertCategoryHeaders() {
         else if (text.includes("喫茶店")) headerHtml = "<div class='custom-layer-header' style='margin:18px 0 10px 0;'><hr style='margin:0 0 12px 0; border:0; border-top:1px solid #ddd;'><div style='font-size:1.05em; font-weight:bold; color:#2E7D32;'>【上級者向け】</div></div>";
         if (headerHtml) label.insertAdjacentHTML('beforebegin', headerHtml);
     });
+    const separator = document.querySelector('.leaflet-control-layers-separator');
+    if (separator) separator.style.display = 'block';
 }
 insertCategoryHeaders();
 map.on('layeradd layerremove', () => setTimeout(insertCategoryHeaders, 10));
@@ -161,8 +144,7 @@ updateScanBtn();
 
 scanBtn?.addEventListener('click', () => {
     if (map.getZoom() < SCAN_ZOOM) return;
-    scanBtn.innerText = "🔄 スキャン中...";
-    scanBtn.classList.add('disabled');
+    scanBtn.innerText = "🔄 スキャン中..."; scanBtn.classList.add('disabled');
     const bounds = map.getBounds();
     setTimeout(() => {
         Object.keys(layerDefs).forEach(key => { if (!immediateLayers.includes(key) && map.hasLayer(layers[key]) && rawData[key]) renderGeoJson(key, bounds); });

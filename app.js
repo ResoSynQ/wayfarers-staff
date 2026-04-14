@@ -209,4 +209,5 @@ document.getElementById('license-btn').addEventListener('click', () => {
 window.addEventListener('load', () => { setTimeout(() => { const s = document.getElementById('loading-screen'); if(s){ s.style.opacity = '0'; setTimeout(()=> s.style.display='none', 800); } }, 3000); });
 
 document.getElementById('location-btn').addEventListener('click', () => { map.locate({setView: true, maxZoom: 16}); });
-map.on('locationfound', (e) => { L.circleMarker(e.latlng, {radius: 8, fillColor: '#007BFF', color: '#fff', weight: 2, fillOpacity
+map.on('locationfound', (e) => { L.circleMarker(e.latlng, {radius: 8, fillColor: '#007BFF', color: '#fff', weight: 2, fillOpacity: 1}).addTo(map).bindPopup("現在地").openPopup(); });
+map.on('locationerror', () => { alert("現在地を取得できませんでした。端末の位置情報設定を確認してください。"); });

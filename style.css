@@ -36,6 +36,27 @@ body, html, #map {
 }
 body.menu-open .leaflet-control-layers { left: 0 !important; }
 
+/* 🚨 Leafletの「常にスクロールバーを出す」お節介仕様を無効化！ */
+.leaflet-control-layers-scrollbar {
+    overflow-y: auto !important;
+    padding-right: 10px !important;
+}
+
+/* 🚨 PCで見てもスマホのような細くて美しいスクロールバーにする魔法 */
+.leaflet-control-layers::-webkit-scrollbar,
+.leaflet-control-layers-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+.leaflet-control-layers::-webkit-scrollbar-track,
+.leaflet-control-layers-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.leaflet-control-layers::-webkit-scrollbar-thumb,
+.leaflet-control-layers-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
 /* 📡 スキャンボタン (画面下部) */
 #scan-btn {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);

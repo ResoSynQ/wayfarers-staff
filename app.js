@@ -1,6 +1,6 @@
 /**
- * 旅人の杖と救いの泉 Ver 2.0.13
- * メインロジック（ポップアップ属性名・完全対応版）
+ * 旅人の杖と救いの泉 Ver 2.0.15
+ * メインロジック（屋号対応 ＆ 喫茶店・レストラン表記変更版）
  */
 
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
@@ -30,6 +30,7 @@ const layerDefs = {
     kanko: { url: 'P12_観光資源_近畿.geojson', style: {color: '#FF8C00', weight: 2, fillOpacity: 0.3} },
     restaurants: { url: 'restaurant.geojson', icon: icons.orange },
     trail: { url: 'OSM_trail.geojson', icon: icons.purple },
+    // 🚨 東海自然歩道は前回の「defaultName」を使うスマートな形に戻したぜ！
     shizenhodo: { url: 'TokaiNatureTrail_Route.geojson', style: {color: '#2E8B57', weight: 4}, defaultName: "東海自然歩道" },
     gokaido: { url: 'gokaido_routes.geojson', style: {color: '#B22222', weight: 4} }
 };
@@ -58,10 +59,10 @@ function renderGeoJson(key, bounds = null) {
         style: def.style,
         onEachFeature: function(feature, layer) {
             const p = feature.properties;
-            // 🚨 【魔法】あらゆるデータ形式に対応するため、名前になりそうな属性を順番に探す！
-            let name = p.name || p.名称 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || def.defaultName || "名称未定";
+            // 🚨 【魔法】「屋号」を名前探しの条件に追加！
+            let name = p.name || p.名称 || p.屋号 || p.地区名 || p.観光資源名 || p.指定名称 || p.文化財名 || p.通称 || def.defaultName || "名称未定";
             
-            // 最後の保険：それでも名称未定で、プロパティの中に「名」がつくキーがあればそれを採用する
+            // 最後の保険
             if (name === "名称未定") {
                 for (let propKey in p) {
                     if (propKey.includes("名") && !propKey.includes("都道府県") && !propKey.includes("市区町村")) {
@@ -106,7 +107,8 @@ const overlayMaps = {
     "🏘️ 伝統的建造物群保存地区": layers.denken,
     "🗺️ 歴史的風致重点地区": layers.fuchi, 
     "🎆 観光資源": layers.kanko, 
-    "🍽️ 飲食店データ": layers.restaurants,
+    // 🚨 メニューの表記を「喫茶店・レストラン」に変更！
+    "🍽️ 喫茶店・レストラン": layers.restaurants,
     "🐾 トレイル.古道": layers.trail,
     "🛤️ 東海自然歩道": layers.shizenhodo, 
     "🛣️ 五街道": layers.gokaido
@@ -176,7 +178,8 @@ let advanceWarningShown = false;
 let restaurantWarningShown = false;
 
 map.on('overlayadd', function(e) {
-    if (e.name.includes('飲食店データ')) {
+    // 🚨 アラート発動の条件も「喫茶店・レストラン」に合わせたぜ！
+    if (e.name.includes('喫茶店・レストラン')) {
         if (!restaurantWarningShown) {
             alert("飲食店データは最大で10mの誤差があることがあります。立ち寄る際は十分に確認してください。");
             restaurantWarningShown = true;
@@ -206,5 +209,4 @@ document.getElementById('license-btn').addEventListener('click', () => {
 window.addEventListener('load', () => { setTimeout(() => { const s = document.getElementById('loading-screen'); if(s){ s.style.opacity = '0'; setTimeout(()=> s.style.display='none', 800); } }, 3000); });
 
 document.getElementById('location-btn').addEventListener('click', () => { map.locate({setView: true, maxZoom: 16}); });
-map.on('locationfound', (e) => { L.circleMarker(e.latlng, {radius: 8, fillColor: '#007BFF', color: '#fff', weight: 2, fillOpacity: 1}).addTo(map).bindPopup("現在地").openPopup(); });
-map.on('locationerror', () => { alert("現在地を取得できませんでした。端末の位置情報設定を確認してください。"); });
+map.on('locationfound', (e) => { L.circleMarker(e.latlng, {radius: 8, fillColor: '#007BFF', color: '#fff', weight: 2, fillOpacity

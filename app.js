@@ -6,7 +6,7 @@
 const map = L.map('map', { center: [34.6937, 135.5023], zoom: 13, maxZoom: 19, zoomControl: false });
 
 // 🚨 ここが錬成した総指揮官の専用マップだ！
-const customMap = L.tileLayer('https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/256/{z}/{x}/{y}.png?key=gw6gL4y47w5r3N8s5rPQ', {
+const customMap = L.tileLayer('https://api.maptiler.com/maps/019d8b1d-1989-74cd-b70b-2ba296c30f3e/style.json?key=GloGcr9XQvZ6g4JrFj0x', {
     maxZoom: 19,
     attribution: '© <a href="https://www.maptiler.com/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });

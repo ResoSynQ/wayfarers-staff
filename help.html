@@ -3,79 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ヘルプ - 旅人の杖と救いの泉</title>
-    <link rel="icon" href="icon-512.jpg">
+    <title>アプリの使用方法について - 旅人の杖と救いの泉</title>
     <style>
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f9f9f9; color: #333; line-height: 1.6; padding: 20px; max-width: 600px; margin: 0 auto; }
-        h1 { color: #111; font-size: 1.5rem; text-align: center; border-bottom: 2px solid #2196F3; padding-bottom: 10px; }
-        h2 { color: #2196F3; font-size: 1.2rem; margin-top: 30px; border-left: 4px solid #2196F3; padding-left: 10px; }
-        h3 { color: #444; font-size: 1.1rem; }
-        p, ul, ol { font-size: 1rem; }
-        ul, ol { padding-left: 20px; }
+        :root {
+            --primary-color: #1565C0;
+            --accent-color: #E65100;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 1.5rem; }
+        h2 {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            border-left: 5px solid var(--primary-color);
+            padding-left: 10px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .icon-box {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            min-width: 30px;
+            text-align: center;
+        }
+        .warning-card {
+            border: 2px solid #ffccbc;
+            background-color: #fff5f2;
+        }
+        .warning-title {
+            color: #d84315;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        ul { padding-left: 20px; margin: 0; }
         li { margin-bottom: 8px; }
-        .pin-blue { color: #2196F3; font-weight: bold; }
-        .pin-green { color: #4CAF50; font-weight: bold; }
-        .pin-red { color: #F44336; font-weight: bold; }
-        .desc { font-weight: normal; font-size: 0.9rem; color: #666; margin-bottom: 15px; display: block; }
-        .highlight { background-color: #fff9c4; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
-        .close-btn { display: block; width: 100%; padding: 15px; background-color: #333; color: white; text-align: center; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 40px; margin-bottom: 20px; border: none; cursor: pointer; font-size: 1rem; }
-        .warning-box { background-color: #ffebee; border: 1px solid #f44336; padding: 10px; border-radius: 5px; font-size: 0.9rem; margin-top: 10px; }
+        b { color: #000; }
+        
+        .footer-btns {
+            margin-top: 40px;
+            padding-bottom: 60px;
+            text-align: center;
+        }
+        .close-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(21, 101, 192, 0.3);
+            transition: transform 0.2s;
+            width: 80%;
+        }
+        .close-btn:active { transform: scale(0.95); }
+        
+        hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
     </style>
 </head>
 <body>
 
-    <h1>❓ 探索マニュアル</h1>
-    <p>『旅人の杖と救いの泉』へようこそ。ここではアプリの基本的な使い方と機能について解説します。</p>
+<header>
+    <h1>アプリの使用方法について</h1>
+    <p style="margin-top:10px; opacity: 0.9;">旅人の杖と救いの泉 探索マニュアル</p>
+</header>
 
-    <h2>1. 基本の探索フロー</h2>
-    <ol>
-        <li><strong>地図を動かす:</strong> 探索したいエリアを表示するか、右下の「🎯」ボタンで現在地に飛びます。</li>
-        <li><strong>メニューを開く:</strong> 左上の「☰」ボタンから、探したい対象（青・緑）にチェックを入れます。</li>
-        <li><strong>スキャン実行:</strong> 画面下の<span class="highlight">周辺をスキャン</span>ボタンを押すと、候補がマップ上にピンとして出現します。</li>
-        <li><strong>詳細を見る:</strong> マップ上のピンをタップすると、名称やカテゴリーを確認できます。</li>
-    </ol>
+<div class="container">
 
-    <h2>2. 画面とボタンの見方</h2>
-    <ul>
-        <li><strong>「☰」 探索メニュー（左上）</strong><br>探したいジャンルをON/OFFできるフィルターです。</li>
-        <li><strong>「🎯」 現在地ボタン（右下）</strong><br>マップをスクロールして迷子になっても、ワンタップで自分の現在地にカメラが戻ります。</li>
-        <li><strong>「周辺をスキャン」ボタン（下部）</strong><br>メインエンジンです。押した瞬間に画面内の候補を一斉に索敵します。<br>
-        <small>※広域すぎると負荷軽減のためボタンが押せなくなります。地図を拡大してください。</small></li>
-    </ul>
-
-    <h2>3. マップ上のピンについて</h2>
-    <ul>
-        <li class="pin-blue">🔵 青いピン（歴史・宗教・公園）</li>
-        <span class="desc">道標、境界標、登山マーカー、公衆時計、祠・寺社、史跡・記念碑、公園・遊具など、主に屋外の探索対象を指します。</span>
-        
-        <li class="pin-green">🟢 緑のピン（公共・文化・体育）</li>
-        <span class="desc">公共施設、図書館、文化センター、体育館、運動広場、国指定文化財など、主に建物や指定を受けた施設を指します。</span>
-        
-        <li class="pin-red">⭕ 赤い丸（トイレ）</li>
-        <span class="desc">公衆トイレ。トイレモード時のみ出現します。</span>
-    </ul>
-
-    <h2>4. 🚾 トイレモード</h2>
-    <p>メニュー内の「トイレ」スイッチをONにすると、通常の探索ピンがすべて消え、<strong>現在見えている範囲のトイレ（赤い丸）</strong>だけが浮かび上がります。</p>
-    
-    <h3>■ トイレの現地調査機能</h3>
-    <p>トイレモード中に表示される「トイレについて連絡」ボタンを押すと、現在地の座標が入力されたメールが立ち上がります。状況を開発へ報告することができます。「トイレがなかった」「マップに載っていないトイレがあった」「トイレが壊れている」等の連絡があればいただければと思います。</p>
-    <div class="warning-box">
-        ※不審物や緊急の状況を見かけた際は警察・救急へご連絡ください。
+    <div class="card">
+        <p>『旅人の杖と救いの泉』へようこそ。ここではアプリの基本的な使い方と機能について解説します。</p>
     </div>
 
-    <h2>5. 💡 より快適な探索のために</h2>
-    <p>本アプリは「PWA」に対応しています。ブラウザのメニューから<strong>「ホーム画面に追加」</strong>を実行してください。全画面でより高速に動作します！</p>
+    <h2>1. 基本の探索フロー</h2>
+    <div class="card">
+        <ul>
+            <li><b>地図を動かす:</b> 探索したいエリアを表示するか、右上の「🧭」ボタンで現在地に飛びます。</li>
+            <li><b>メニューを開く:</b> 左上の「☰」ボタンから、対象にチェックを入れます。（※広域データやルートなどは即時表示されます）</li>
+            <li><b>スキャン実行:</b> 下部の「周辺をスキャン」ボタンを押すと、画面内の候補がピンとして出現します。</li>
+            <li><b>詳細を見る:</b> ピンやルートをタップすると、名称や詳細を確認できます。</li>
+        </ul>
+    </div>
 
-    <h2>6. アプリの削除とデータについて</h2>
-    <ul>
-        <li><strong>📱 アイコンの削除</strong><br>
-        ホーム画面のアイコンを長押で消去できます。</li>
-        <li><strong>⚠️ キャッシュの保持を推奨</strong><br>
-        このアプリは初回起動時にデータを「キャッシュ」に保存します。これにより素早く周囲のサーチが可能となっています。端末が重くなった場合はブラウザの履歴消去などでキャッシュを消すと動作の改善が見込めます。</li>
-    </ul>
+    <h2>2. 画面とボタンの見方</h2>
+    <div class="card">
+        <div class="icon-box">
+            <div class="icon">☰</div>
+            <div><b>探索メニュー（左上）</b><br>ジャンルをON/OFFできるフィルターです。</div>
+        </div>
+        <div class="icon-box">
+            <div class="icon">🧭</div>
+            <div><b>現在地ボタン（右上）</b><br>ワンタップで自分の現在地にカメラが戻ります。</div>
+        </div>
+        <div class="icon-box">
+            <div class="icon">📡</div>
+            <div><b>周辺をスキャン（下部）</b><br>メインエンジンです。画面内の候補を一斉に索敵します。※広域すぎるとボタンは押せません。</div>
+        </div>
+        <div class="icon-box">
+            <div class="icon">❓📜</div>
+            <div><b>各種ボタン（右下）</b><br>ヘルプ画面とライセンス画面を開きます。</div>
+        </div>
+    </div>
 
-  <button onclick="window.location.href='index.html';" class="close-btn">マップへ戻る</button>
+    <h2>3. マップ上の表示について</h2>
+    <div class="card">
+        <p>🔵 <b>青いピン（基本探索）:</b> 道標、公園・遊具など。</p>
+        <p>🟢 <b>緑のピン（施設・文化財）:</b> 公共施設、文化施設、文化財など。</p>
+        <p>🟠 <b>オレンジのピン:</b> 喫茶店・レストラン。※後述の注意参照</p>
+        <p>🟣 <b>紫のピン・線:</b> トレイル・古道などのルート。※後述の注意参照</p>
+        <p>🗺️ <b>色付きエリア:</b> 景観地区、歴史的風土保存区域などの指定範囲。</p>
+        <p>⭕ <b>赤い丸:</b> 公衆トイレ。</p>
+    </div>
+
+    <h2>4. ⚠️ 重要：ご利用上の注意</h2>
+    <div class="card warning-card">
+        <div class="warning-title">【トレイル・古道・自然歩道】</div>
+        <p style="font-size: 0.95rem;">
+            本格的な登山道や通り抜け困難な難所が含まれる場合があります。探索の際は<b>必ず事前のルート計画と装備の準備</b>を行い、周囲の人に<b>「どこへ行くか」を一声かけてから</b>出発してください。
+        </p>
+        <hr>
+        <div class="warning-title">【喫茶店・レストラン】</div>
+        <p style="font-size: 0.95rem;">
+            住所を座標に変換しているため、実際の場所から<b>最大で10m程度の誤差</b>が生じることがあります。現地では周囲の状況や最新の営業状態を十分に確認してください。
+        </p>
+    </div>
+
+    <h2>5. 🚾 トイレモードと調査機能</h2>
+    <div class="card">
+        <p>メニュー内の「トイレ」スイッチをONにすると、現在範囲のトイレ（赤い丸）が浮かび上がります。</p>
+        <p>「トイレについて連絡」ボタンで、現在地の座標をメールで報告できます。「壊れている」「載っていない」等の情報提供にご協力ください。</p>
+        <p style="font-size: 0.8rem; color: #666;">※緊急時は警察・救急へご連絡ください。</p>
+    </div>
+
+    <h2>6. 💡 快適な探索のために</h2>
+    <div class="card">
+        <p>本アプリは<b>「PWA」</b>に対応しています。ブラウザのメニューから<b>「ホーム画面に追加」</b>を実行してください。全画面でより高速に動作します！</p>
+    </div>
+
+    <h2>7. アプリの削除とデータについて</h2>
+    <div class="card">
+        <p><b>📱 アイコンの削除:</b> ホーム画面のアイコンを長押しで消去できます。</p>
+        <p><b>⚠️ キャッシュについて:</b> データを端末に一時保存（キャッシュ）することで高速化しています。動作が重い場合はブラウザの履歴消去でキャッシュを消すと改善します。</p>
+    </div>
+
+    <div class="footer-btns">
+        <button onclick="window.location.href='index.html';" class="close-btn">マップへ戻る</button>
+    </div>
+
+</div>
 
 </body>
 </html>
